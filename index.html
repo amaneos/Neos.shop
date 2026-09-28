@@ -1,29 +1,34 @@
 
 <!DOCTYPE html>
-<html lang="fa" dir="rtl" class="scroll-smooth">
+<html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEOS SHOP | فروشگاه اینترنتی پوشاک لوکس و استریت‌ویر</title>
+    <title>NEOS SHOP | فروشگاه آنلاین پوشاک لوکس</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Vazirmatn Persian Font -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
-    <!-- FontAwesome 6 Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        obsidian: '#0f172a',
-                        charcoal: '#1e293b',
-                        warmgold: '#d97706',
-                        softbg: '#f8fafc',
-                    },
                     fontFamily: {
                         sans: ['Vazirmatn', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            bg: '#FDFBF7',
+                            card: '#FFFFFF',
+                            primary: '#1A1A1A',
+                            gold: '#C5A880',
+                            goldHover: '#B2936B',
+                            accent: '#F4EFEA',
+                            border: '#E8E2D9'
+                        }
                     }
                 }
             }
@@ -32,1650 +37,1441 @@
     
     <style>
         body {
+            background-color: #FDFBF7;
             font-family: 'Vazirmatn', sans-serif;
-            background-color: #f8fafc;
-            color: #0f172a;
-            -webkit-tap-highlight-color: transparent;
+            color: #1A1A1A;
+            overflow-x: hidden;
         }
         
-        /* Custom scrollbars */
+        /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
-            height: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: #f1f5f9;
+            background: #FDFBF7;
         }
         ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 9999px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+            background: #C5A880;
+            border-radius: 4px;
         }
 
-        .glass-card {
-            background: rgba(255, 255, 255, 0.9);
+        /* Glassmorphism effects */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(226, 232, 240, 0.8);
+            -webkit-backdrop-filter: blur(12px);
         }
-
-        .badge-pulse {
-            animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-
-        @keyframes pulse-ring {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.85; transform: scale(1.05); }
-        }
-
-        /* Color Swatch active state */
-        .color-swatch-active {
-            ring: 2px;
-            ring-offset: 2px;
-            ring-color: #0f172a;
+        
+        .modal-active {
+            overflow: hidden;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-obsidian selection:text-white">
+<body class="antialiased min-h-screen flex flex-col justify-between selection:bg-brand-gold selection:text-white">
 
-    <div id="toast-container" class="fixed top-5 left-5 z-[100] flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+    <!-- Notification Toast Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-    <!-- ========================================== -->
-    <!-- PUBLIC SHOPPING INTERFACE (MANDATORY RETAIL) -->
-    <!-- ========================================== -->
-    <div id="public-app-view" class="flex-grow flex flex-col">
-        
-        <div class="bg-obsidian text-slate-200 text-xs py-2 px-4 text-center tracking-wide font-light flex items-center justify-center gap-2">
-            <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            <span>ارسال رایگان سفارش‌های بالای ۳ میلیون تومان به سراسر ایران | تحویل اکسپرس</span>
-        </div>
-
-        <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 transition-all duration-300">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex items-center justify-between h-20">
-                    
-                    <!-- Right Header Actions (Mobile menu toggle & Categories) -->
-                    <div class="flex items-center gap-4">
-                        <button id="mobile-menu-btn" onclick="toggleMobileDrawer(true)" class="lg:hidden p-2 text-slate-700 hover:text-black focus:outline-none">
-                            <i class="fa-solid fa-bars text-xl"></i>
-                        </button>
-                        
-                        <nav class="hidden lg:flex items-center gap-8 text-sm font-medium text-slate-600">
-                            <a href="#" onclick="filterCategory('همه')" class="hover:text-black transition-colors">کالکشن جدید</a>
-                            <a href="#" onclick="filterCategory('هودی و دورس')" class="hover:text-black transition-colors">هودی و دورس</a>
-                            <a href="#" onclick="filterCategory('تیشرت و پولوشرت')" class="hover:text-black transition-colors">تیشرت</a>
-                            <a href="#" onclick="filterCategory('شلوار و کارگو')" class="hover:text-black transition-colors">شلوار</a>
-                            <a href="#" onclick="filterCategory('پالتو و کاپشن')" class="hover:text-black transition-colors">پالتو و کاپشن</a>
-                        </nav>
-                    </div>
-
-                    <!-- Center Brand Logo -->
-                    <div class="text-center cursor-pointer" onclick="resetToHome()">
-                        <h1 id="brand-logo-text" class="text-2xl sm:text-3xl font-black tracking-[0.25em] text-obsidian uppercase">NEOS</h1>
-                        <p class="text-[9px] tracking-[0.3em] text-slate-400 uppercase font-sans font-medium -mt-1">Luxury Apparel</p>
-                    </div>
-
-                    <!-- Left Actions (Search, Account, Cart) -->
-                    <div class="flex items-center gap-3 sm:gap-5">
-                        <div class="relative hidden sm:block">
-                            <input type="text" id="header-search-input" onkeyup="handleSearch(this.value)" placeholder="جستجوی محصول..." class="bg-slate-100/80 text-xs text-slate-800 rounded-full py-2 px-4 pr-9 border border-transparent focus:border-slate-300 focus:bg-white focus:outline-none w-44 transition-all focus:w-60">
-                            <i class="fa-solid fa-magnifying-glass absolute right-3 top-2.5 text-slate-400 text-xs"></i>
-                        </div>
-
-                        <button onclick="openCustomerAuthModal()" class="p-2 text-slate-700 hover:text-black transition-colors relative" title="حساب کاربری">
-                            <i class="fa-regular fa-user text-lg"></i>
-                            <span id="user-badge-dot" class="hidden absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-500"></span>
-                        </button>
-
-                        <button onclick="toggleCartDrawer(true)" class="p-2 text-slate-700 hover:text-black transition-colors relative" title="سبد خرید">
-                            <i class="fa-solid fa-bag-shopping text-lg"></i>
-                            <span id="cart-count-badge" class="absolute -top-1 -left-1 bg-obsidian text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white">0</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <div id="mobile-drawer" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
-            <div id="mobile-drawer-content" class="bg-white w-4/5 max-w-xs h-full p-6 flex flex-col justify-between transform translate-x-full transition-transform duration-300">
-                <div>
-                    <div class="flex items-center justify-between border-b pb-4 mb-6">
-                        <h2 class="font-bold text-lg text-obsidian tracking-wider">منوی نیوس</h2>
-                        <button onclick="toggleMobileDrawer(false)" class="text-slate-400 hover:text-black"><i class="fa-solid fa-xmark text-xl"></i></button>
-                    </div>
-                    <div class="mb-6">
-                        <input type="text" onkeyup="handleSearch(this.value)" placeholder="جستجوی لباس، رنگ..." class="w-full bg-slate-100 text-xs rounded-lg py-2.5 px-3 border focus:outline-none">
-                    </div>
-                    <nav class="flex flex-col gap-4 text-sm font-medium text-slate-700">
-                        <a href="#" onclick="filterCategory('همه'); toggleMobileDrawer(false);" class="py-2 border-b border-slate-100">همه محصولات</a>
-                        <a href="#" onclick="filterCategory('هودی و دورس'); toggleMobileDrawer(false);" class="py-2 border-b border-slate-100">هودی و دورس</a>
-                        <a href="#" onclick="filterCategory('تیشرت و پولوشرت'); toggleMobileDrawer(false);" class="py-2 border-b border-slate-100">تیشرت و پولوشرت</a>
-                        <a href="#" onclick="filterCategory('شلوار و کارگو'); toggleMobileDrawer(false);" class="py-2 border-b border-slate-100">شلوار و کارگو</a>
-                        <a href="#" onclick="filterCategory('پالتو و کاپشن'); toggleMobileDrawer(false);" class="py-2 border-b border-slate-100">پالتو و کاپشن</a>
-                        <a href="#" onclick="openCustomerAuthModal(); toggleMobileDrawer(false);" class="py-2 border-b border-slate-100 text-warmgold flex items-center gap-2">
-                            <i class="fa-solid fa-user-circle"></i> حساب کاربری من / پیگیری سفارش
-                        </a>
-                    </nav>
-                </div>
-                <div class="text-xs text-slate-400 text-center pt-4 border-t">
-                    <p>پشتیبانی: <span id="drawer-phone">021-91000000</span></p>
-                    <p class="mt-1">اینستاگرام: <span id="drawer-instagram">@neos_store</span></p>
-                </div>
-            </div>
-        </div>
-
-        <!-- MAIN CONTAINER -->
-        <main class="flex-grow">
-            
-            <section id="hero-section" class="relative bg-slate-900 text-white overflow-hidden my-4 max-w-7xl mx-auto rounded-2xl sm:rounded-3xl shadow-xl mx-3 sm:mx-auto">
-                <div class="absolute inset-0 z-0 opacity-40">
-                    <img id="hero-banner-img" src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1600&q=80" alt="NEOS Luxury Fashion" class="w-full h-full object-cover">
-                </div>
-                <div class="relative z-10 py-16 px-6 sm:py-24 sm:px-12 max-w-2xl text-right flex flex-col items-start gap-4">
-                    <span class="inline-block bg-white/20 backdrop-blur-md text-white text-xs px-3 py-1 rounded-full tracking-widest font-light border border-white/30">کالکشن زمستانه ۱۴۰۳</span>
-                    <h2 id="hero-slogan-text" class="text-3xl sm:text-5xl font-extrabold leading-tight tracking-tight text-white">لوکس‌ترین استریت‌ویر مینیمال ایرانی</h2>
-                    <p class="text-slate-200 text-sm sm:text-base font-light leading-relaxed">طراحی مدرن، پارچه‌های سه نخ سنگین و برش‌های حرفه‌ای اختصاصی برند نیوس برای استایل خاص شما.</p>
-                    <a href="#product-catalog" class="mt-2 inline-flex items-center gap-3 bg-white text-obsidian px-7 py-3.5 rounded-full font-bold text-xs sm:text-sm hover:bg-slate-100 transition-all shadow-lg hover:shadow-2xl hover:-translate-y-0.5">
-                        <span>مشاهده و خرید کالکشن</span>
-                        <i class="fa-solid fa-arrow-left text-xs"></i>
-                    </a>
-                </div>
-            </section>
-
-            <section class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-2 lg:grid-cols-4 gap-4 text-center">
-                <div class="p-4 bg-white rounded-2xl border border-slate-200/60 shadow-sm flex flex-col items-center gap-2">
-                    <i class="fa-solid fa-truck-fast text-2xl text-obsidian"></i>
-                    <h4 class="text-xs font-bold text-slate-800">تحویل سریع پستی</h4>
-                    <p class="text-[11px] text-slate-500">ارسال با پست پیشتاز و تیپاکس</p>
-                </div>
-                <div class="p-4 bg-white rounded-2xl border border-slate-200/60 shadow-sm flex flex-col items-center gap-2">
-                    <i class="fa-solid fa-[#d97706] fa-shield-halved text-2xl text-warmgold"></i>
-                    <h4 class="text-xs font-bold text-slate-800">تضمین اصالت پارچه</h4>
-                    <p class="text-[11px] text-slate-500">پنبه ۱۰۰٪ بدون آبرفت</p>
-                </div>
-                <div class="p-4 bg-white rounded-2xl border border-slate-200/60 shadow-sm flex flex-col items-center gap-2">
-                    <i class="fa-solid fa-arrows-rotate text-2xl text-obsidian"></i>
-                    <h4 class="text-xs font-bold text-slate-800">۷ روز ضمانت تعویض</h4>
-                    <p class="text-[11px] text-slate-500">تعویض بی‌قید و شرط سایز</p>
-                </div>
-                <div class="p-4 bg-white rounded-2xl border border-slate-200/60 shadow-sm flex flex-col items-center gap-2">
-                    <i class="fa-solid fa-headset text-2xl text-obsidian"></i>
-                    <h4 class="text-xs font-bold text-slate-800">پشتیبانی همیشگی</h4>
-                    <p class="text-[11px] text-slate-500">پاسخگویی سریع در تلگرام و تلفن</p>
-                </div>
-            </section>
-
-            <section id="product-catalog" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <!-- Catalog Header Controls -->
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 border-b pb-6 border-slate-200">
-                    <div>
-                        <h3 class="text-2xl font-bold text-obsidian tracking-tight">محصولات برتر</h3>
-                        <p class="text-xs text-slate-500 mt-1">تعداد محصولات موجود: <span id="catalog-count-badge" class="font-bold text-obsidian">0</span> عدد</p>
-                    </div>
-
-                    <!-- Category Filter Chips -->
-                    <div id="category-chips" class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-                        <!-- Dynamic categories injection -->
-                    </div>
-
-                    <!-- Sort Controls -->
-                    <div class="flex items-center gap-2 self-end md:self-auto">
-                        <span class="text-xs text-slate-500 font-medium whitespace-nowrap">مرتب‌سازی:</span>
-                        <select id="sort-select" onchange="renderProducts()" class="bg-white border border-slate-200 text-xs rounded-xl py-2 px-3 text-slate-700 focus:outline-none focus:border-slate-400">
-                            <option value="newest">جدیدترین‌ها</option>
-                            <option value="price-asc">ارزان‌ترین</option>
-                            <option value="price-desc">گران‌ترین</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Product Grid Container -->
-                <div id="products-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-                    <!-- Products dynamically rendered here -->
-                </div>
-            </section>
-        </main>
-
-        <footer class="bg-obsidian text-slate-300 mt-20 border-t border-slate-800">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-                    <div class="md:col-span-2">
-                        <h3 class="text-2xl font-black tracking-widest text-white mb-3">NEOS SHOP</h3>
-                        <p class="text-xs text-slate-400 leading-relaxed max-w-md">برند نیوس با هدف ارائه لباس‌های استریت‌ویر لوکس، مینیمال و پارچه‌های باکیفیت استاندارد جهانی برای علاقه‌مندان به مد و استایل خیابانی مدرن تاسیس گردیده است.</p>
-                    </div>
-                    <div>
-                        <h4 class="text-sm font-bold text-white mb-3">دسترسی سریع</h4>
-                        <ul class="text-xs space-y-2 text-slate-400">
-                            <li><a href="#" onclick="filterCategory('همه')" class="hover:text-white transition-colors">کالکشن جدید</a></li>
-                            <li><a href="#" onclick="openCustomerAuthModal()" class="hover:text-white transition-colors">پیگیری سفارشات</a></li>
-                            <li><a href="#" onclick="toggleCartDrawer(true)" class="hover:text-white transition-colors">سبد خرید</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="text-sm font-bold text-white mb-3">ارتباط با ما</h4>
-                        <p class="text-xs text-slate-400 mb-2"><i class="fa-solid fa-phone text-warmgold ml-2"></i> تلفن: <span id="footer-phone">021-91000000</span></p>
-                        <p class="text-xs text-slate-400 mb-2"><i class="fa-brands fa-instagram text-warmgold ml-2"></i> اینستاگرام: <span id="footer-instagram">@neos_store</span></p>
-                        <p class="text-xs text-slate-400"><i class="fa-solid fa-location-dot text-warmgold ml-2"></i> تهران، خیابان فرشته، مرکز تجاری نیوس</p>
-                    </div>
-                </div>
-                <div class="border-t border-slate-800 pt-6 text-center text-xs text-slate-500">
-                    <p>© تمامی حقوق برای برند ثبت‌شده NEOS SHOP محفوظ است.</p>
-                </div>
-            </div>
-        </footer>
+    <!-- Announcement Bar -->
+    <div class="bg-brand-primary text-brand-bg text-xs py-2 px-4 text-center font-light tracking-wide flex justify-between items-center px-6">
+        <span class="hidden md:inline">ارسال رایگان برای خریدهای بالای ۲ میلیون تومان</span>
+        <span class="mx-auto md:mx-0">✨ کالکشن جدید پاییزه و زمستانه NEOS رونمایی شد</span>
+        <span class="hidden md:inline">پشتیبانی: ۰۲۱-۸۸۸۸۹۹۹۹</span>
     </div>
 
-
-    <!-- ========================================== -->
-    <!-- SECURE HIDDEN ADMIN GATEWAY & PANEL       -->
-    <!-- (Strictly isolated - NO admin link in shop)-->
-    <!-- ========================================== -->
-    <div id="admin-app-view" class="hidden min-h-screen bg-slate-900 text-slate-100 flex-col">
-        <header class="bg-slate-950 border-b border-slate-800 py-4 px-6 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <span class="bg-warmgold text-black font-extrabold text-xs px-2.5 py-1 rounded">ADMIN PANEL</span>
-                <h2 class="text-lg font-bold tracking-wider text-white">مدیریت فروشگاه نیوس</h2>
-            </div>
-            <div class="flex items-center gap-4">
-                <span id="current-admin-display" class="text-xs text-slate-400">ورود به عنوان: -</span>
-                <button onclick="logoutAdmin()" class="bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white text-xs px-3 py-1.5 rounded-lg transition-colors">
-                    <i class="fa-solid fa-arrow-right-from-bracket ml-1"></i> خروج ادمین
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-40 glass-panel border-b border-brand-border transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            
+            <!-- Mobile Menu Toggle & Search -->
+            <div class="flex items-center gap-4 lg:hidden">
+                <button id="mobile-menu-btn" class="text-xl p-2 text-brand-primary hover:text-brand-gold transition">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <button onclick="toggleSearchModal()" class="text-lg p-2 text-brand-primary hover:text-brand-gold transition">
+                    <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
             </div>
-        </header>
 
-        <div class="flex-grow flex flex-col md:flex-row">
-            <!-- Admin Navigation Sidebar -->
-            <aside class="w-full md:w-64 bg-slate-950/60 border-l border-slate-800 p-4 space-y-2">
-                <button onclick="switchAdminTab('dashboard')" id="adm-nav-dashboard" class="w-full text-right px-4 py-3 rounded-xl text-xs font-semibold hover:bg-slate-800 transition-colors flex items-center justify-between active-adm-nav">
-                    <span><i class="fa-solid fa-chart-line ml-2"></i> داشبورد و آمار</span>
-                </button>
-                <button onclick="switchAdminTab('products')" id="adm-nav-products" class="w-full text-right px-4 py-3 rounded-xl text-xs font-semibold hover:bg-slate-800 transition-colors flex items-center justify-between">
-                    <span><i class="fa-solid fa-shirt ml-2"></i> مدیریت محصولات و تنوع</span>
-                </button>
-                <button onclick="switchAdminTab('orders')" id="adm-nav-orders" class="w-full text-right px-4 py-3 rounded-xl text-xs font-semibold hover:bg-slate-800 transition-colors flex items-center justify-between">
-                    <span><i class="fa-solid fa-boxes-packing ml-2"></i> مدیریت سفارشات</span>
-                    <span id="admin-pending-orders-badge" class="bg-warmgold text-black text-[10px] font-bold px-2 py-0.5 rounded-full hidden">0</span>
-                </button>
-                <button onclick="switchAdminTab('categories')" id="adm-nav-categories" class="w-full text-right px-4 py-3 rounded-xl text-xs font-semibold hover:bg-slate-800 transition-colors flex items-center justify-between">
-                    <span><i class="fa-solid fa-tags ml-2"></i> دسته‌بندی‌ها</span>
-                </button>
-                <button onclick="switchAdminTab('approvals')" id="adm-nav-approvals" class="w-full text-right px-4 py-3 rounded-xl text-xs font-semibold hover:bg-slate-800 transition-colors flex items-center justify-between">
-                    <span><i class="fa-solid fa-user-shield ml-2"></i> دسترسی ادمین‌ها</span>
-                    <span id="admin-pending-users-badge" class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full hidden">0</span>
-                </button>
-                <button onclick="switchAdminTab('settings')" id="adm-nav-settings" class="w-full text-right px-4 py-3 rounded-xl text-xs font-semibold hover:bg-slate-800 transition-colors flex items-center justify-between">
-                    <span><i class="fa-solid fa-sliders ml-2"></i> تنظیمات برند</span>
-                </button>
-            </aside>
+            <!-- Desktop Navigation Links -->
+            <nav class="hidden lg:flex items-center gap-8 text-sm font-medium text-brand-primary">
+                <a href="#" onclick="filterByCategory('all')" class="hover:text-brand-gold transition py-2 border-b-2 border-transparent hover:border-brand-gold">همه محصولات</a>
+                <a href="#" onclick="filterByCategory('هودی و دورس')" class="hover:text-brand-gold transition py-2 border-b-2 border-transparent hover:border-brand-gold">هودی و دورس</a>
+                <a href="#" onclick="filterByCategory('پافر و کاپشن')" class="hover:text-brand-gold transition py-2 border-b-2 border-transparent hover:border-brand-gold">پافر و کاپشن</a>
+                <a href="#" onclick="filterByCategory('شلوار')" class="hover:text-brand-gold transition py-2 border-b-2 border-transparent hover:border-brand-gold">شلوار و اسلش</a>
+                <a href="#" onclick="filterByCategory('تیشرت')" class="hover:text-brand-gold transition py-2 border-b-2 border-transparent hover:border-brand-gold">تیشرت لوکس</a>
+            </nav>
 
-            <!-- Admin Main View Dynamic Area -->
-            <main class="flex-grow p-6 bg-slate-900 overflow-y-auto">
+            <!-- Brand Logo -->
+            <div class="text-center cursor-pointer" onclick="window.location.hash=''; renderApp();">
+                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-widest text-brand-primary">N E O S</h1>
+                <p class="text-[9px] tracking-[0.3em] uppercase text-brand-gold font-semibold -mt-1">Luxury Apparel</p>
+            </div>
+
+            <!-- Actions Right (Search, Account, Cart, Admin) -->
+            <div class="flex items-center gap-3 sm:gap-4">
+                <button onclick="toggleSearchModal()" class="hidden lg:flex items-center gap-2 bg-brand-accent px-3 py-1.5 rounded-full text-xs text-stone-600 hover:bg-stone-200 transition">
+                    <i class="fa-solid fa-magnifying-glass text-brand-gold"></i>
+                    <span>جستجو...</span>
+                </button>
+
+                <!-- Admin Link -->
+                <button onclick="openAdminPanel()" class="text-xs bg-stone-900 text-amber-100 hover:bg-stone-800 px-3 py-1.5 rounded-full font-medium transition flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-user-shield text-brand-gold"></i>
+                    <span class="hidden sm:inline">پنل مدیریت</span>
+                </button>
+
+                <!-- Customer Account Button -->
+                <button id="account-btn" onclick="handleAccountClick()" class="p-2 text-brand-primary hover:text-brand-gold transition relative group">
+                    <i class="fa-regular fa-user text-xl"></i>
+                    <span id="user-badge" class="hidden absolute top-1 right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white"></span>
+                </button>
+
+                <!-- Cart Button -->
+                <button onclick="toggleCartDrawer()" class="p-2 text-brand-primary hover:text-brand-gold transition relative">
+                    <i class="fa-solid fa-bag-shopping text-xl"></i>
+                    <span id="cart-count" class="absolute -top-1 -right-1 bg-brand-gold text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-white">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobile-menu" class="fixed inset-0 bg-black/50 z-50 hidden transition-opacity duration-300">
+        <div class="bg-brand-bg w-4/5 max-w-sm h-full p-6 flex flex-col justify-between shadow-2xl">
+            <div>
+                <div class="flex justify-between items-center mb-8 border-b border-brand-border pb-4">
+                    <h2 class="text-xl font-bold tracking-widest">NEOS SHOP</h2>
+                    <button onclick="toggleMobileMenu()" class="text-xl text-stone-500 hover:text-black"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <nav class="flex flex-col gap-4 text-base font-medium">
+                    <a href="#" onclick="filterByCategory('all'); toggleMobileMenu();" class="py-2 border-b border-stone-100">همه محصولات</a>
+                    <a href="#" onclick="filterByCategory('هودی و دورس'); toggleMobileMenu();" class="py-2 border-b border-stone-100">هودی و دورس</a>
+                    <a href="#" onclick="filterByCategory('پافر و کاپشن'); toggleMobileMenu();" class="py-2 border-b border-stone-100">پافر و کاپشن</a>
+                    <a href="#" onclick="filterByCategory('شلوار'); toggleMobileMenu();" class="py-2 border-b border-stone-100">شلوار</a>
+                    <a href="#" onclick="filterByCategory('تیشرت'); toggleMobileMenu();" class="py-2 border-b border-stone-100">تیشرت</a>
+                </nav>
+            </div>
+            <div class="border-t border-brand-border pt-4 text-xs text-stone-500 text-center">
+                پشتیبانی: ۰۲۱-۸۸۸۸۹۹۹۹
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-grow">
+        <!-- Hero Banner -->
+        <section class="relative bg-stone-900 text-white overflow-hidden py-16 sm:py-24">
+            <div class="absolute inset-0 opacity-40 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1600&auto=format&fit=crop');"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-stone-950 via-stone-900/80 to-transparent"></div>
+            
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col items-start justify-center min-h-[320px]">
+                <span class="text-brand-gold font-semibold tracking-widest text-xs uppercase mb-3">NEW WINTER COLLECTION 2026</span>
+                <h2 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold mb-4 leading-tight">پوشاک لوکس و مینیمال <br><span class="text-brand-gold font-light">اصالت در استایل شما</span></h2>
+                <p class="text-stone-300 text-sm sm:text-base max-w-md mb-8 font-light leading-relaxed">کالکشن جدید با برترین پارچه‌های وارداتی، دوخت صنعتی استاندارد و طراحی مدرن آماده سفارش است.</p>
+                <a href="#products-section" class="bg-brand-gold hover:bg-brand-goldHover text-white px-8 py-3.5 rounded-full font-medium transition shadow-lg hover:shadow-xl hover:scale-105 transform duration-200">مشاهده محصولات</a>
+            </div>
+        </section>
+
+        <!-- Products Section -->
+        <section id="products-section" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            
+            <!-- Category Pills & Controls -->
+            <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4 border-b border-brand-border pb-6">
+                <div>
+                    <h3 class="text-2xl font-bold text-brand-primary">محصولات برجسته</h3>
+                    <p class="text-xs text-stone-500 mt-1">تضمین کیفیت و اصالت تمام محصولات NEOS</p>
+                </div>
                 
-                <div id="adm-tab-dashboard" class="space-y-6">
-                    <h3 class="text-xl font-bold text-white mb-4">خلاصه وضعیت فروشگاه</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div class="bg-slate-800/80 p-5 rounded-2xl border border-slate-700">
-                            <span class="text-xs text-slate-400">کل فروش ثبت‌شده</span>
-                            <div id="adm-stat-revenue" class="text-2xl font-black text-emerald-400 mt-2">۰ تومان</div>
-                        </div>
-                        <div class="bg-slate-800/80 p-5 rounded-2xl border border-slate-700">
-                            <span class="text-xs text-slate-400">تعداد سفارشات</span>
-                            <div id="adm-stat-orders-count" class="text-2xl font-black text-white mt-2">۰</div>
-                        </div>
-                        <div class="bg-slate-800/80 p-5 rounded-2xl border border-slate-700">
-                            <span class="text-xs text-slate-400">محصولات فعال</span>
-                            <div id="adm-stat-products-count" class="text-2xl font-black text-white mt-2">۰</div>
-                        </div>
-                        <div class="bg-slate-800/80 p-5 rounded-2xl border border-slate-700">
-                            <span class="text-xs text-slate-400">ادمین‌های در انتظار تایید</span>
-                            <div id="adm-stat-pending-admins" class="text-2xl font-black text-warmgold mt-2">۰</div>
+                <!-- Category Filter Buttons -->
+                <div class="flex flex-wrap gap-2" id="category-pills">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Products Grid -->
+            <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
+                <!-- Populated dynamically -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-stone-900 text-stone-300 pt-16 pb-8 border-t border-stone-800 mt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+            <div>
+                <h4 class="text-2xl font-bold text-white tracking-widest mb-4">N E O S</h4>
+                <p class="text-xs text-stone-400 leading-relaxed font-light mb-4">
+                    فروشگاه اینترنتی پوشاک لوکس NEOS با هدف ارائه بهترین کیفیت، استایل‌های مدرن و مینیمال برای افرادی که به ظاهر خود اهمیت می‌دهند.
+                </p>
+                <div class="flex gap-4 text-brand-gold text-lg">
+                    <a href="#" class="hover:text-white transition"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" class="hover:text-white transition"><i class="fa-brands fa-telegram"></i></a>
+                    <a href="#" class="hover:text-white transition"><i class="fa-brands fa-whatsapp"></i></a>
+                </div>
+            </div>
+
+            <div>
+                <h5 class="text-white font-semibold mb-4 text-sm">دسترسی سریع</h5>
+                <ul class="space-y-2 text-xs font-light">
+                    <li><a href="#" onclick="filterByCategory('all')" class="hover:text-brand-gold transition">جدیدترین محصولات</a></li>
+                    <li><a href="#" onclick="filterByCategory('هودی و دورس')" class="hover:text-brand-gold transition">هودی و دورس</a></li>
+                    <li><a href="#" onclick="filterByCategory('پافر و کاپشن')" class="hover:text-brand-gold transition">کاپشن و پافر</a></li>
+                    <li><a href="#" onclick="openAdminPanel()" class="hover:text-brand-gold transition">ورود به پنل مدیریت</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h5 class="text-white font-semibold mb-4 text-sm">خدمات مشتریان</h5>
+                <ul class="space-y-2 text-xs font-light">
+                    <li><a href="#" onclick="handleAccountClick()" class="hover:text-brand-gold transition">حساب کاربری من</a></li>
+                    <li><a href="#" onclick="handleAccountClick()" class="hover:text-brand-gold transition">پیگیری سفارشات</a></li>
+                    <li><a href="#" class="hover:text-brand-gold transition">راهنمای سایزبندی</a></li>
+                    <li><a href="#" class="hover:text-brand-gold transition">رویه بازگرداندن کالا</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h5 class="text-white font-semibold mb-4 text-sm">ارتباط با ما</h5>
+                <div class="text-xs font-light space-y-3 text-stone-400">
+                    <p><i class="fa-solid fa-location-dot text-brand-gold ml-2"></i> تهران، خیابان فرشته، برج آکوا، طبقه ۴</p>
+                    <p><i class="fa-solid fa-phone text-brand-gold ml-2"></i> ۰۲۱-۸۸۸۸۹۹۹۹</p>
+                    <p><i class="fa-solid fa-envelope text-brand-gold ml-2"></i> info@neosshop.ir</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-stone-800 pt-6 flex flex-col sm:flex-row justify-between items-center text-xs text-stone-500 font-light">
+            <p>© ۲۰۲۶ تمامی حقوق برای برند پوشاک NEOS محفوظ است.</p>
+            <p class="mt-2 sm:mt-0">طراحی لوکس و اختصاصی تک‌فایلی</p>
+        </div>
+    </footer>
+
+    
+    <!-- 1. AUTH MODAL (Login / Register) -->
+    <div id="auth-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-brand-bg w-full max-w-md rounded-2xl p-6 sm:p-8 shadow-2xl relative border border-brand-border animate-fade-in">
+            <button onclick="closeAuthModal()" class="absolute top-4 left-4 text-stone-400 hover:text-stone-800 text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            
+            <!-- Auth Tabs -->
+            <div class="flex border-b border-stone-200 mb-6">
+                <button id="tab-login-btn" onclick="switchAuthTab('login')" class="w-1/2 pb-3 font-bold text-center border-b-2 border-brand-gold text-brand-primary">ورود به حساب</button>
+                <button id="tab-register-btn" onclick="switchAuthTab('register')" class="w-1/2 pb-3 font-semibold text-center border-b-2 border-transparent text-stone-400 hover:text-stone-700">ثبت‌نام جدید</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+                <div class="text-xs text-stone-500 mb-2">جهت ورود، شماره موبایل و رمز عبور خود را وارد کنید.</div>
+                <div>
+                    <label class="block text-xs font-semibold text-stone-700 mb-1">شماره موبایل</label>
+                    <input type="tel" id="login-phone" placeholder="09123456789" required class="w-full px-4 py-2.5 rounded-xl border border-stone-300 focus:outline-none focus:border-brand-gold text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-stone-700 mb-1">رمز عبور</label>
+                    <input type="password" id="login-password" placeholder="••••••••" required class="w-full px-4 py-2.5 rounded-xl border border-stone-300 focus:outline-none focus:border-brand-gold text-sm">
+                </div>
+                <button type="submit" class="w-full bg-brand-primary hover:bg-black text-white font-medium py-3 rounded-xl transition text-sm shadow-md mt-2">ورود به سایت</button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="register-form" onsubmit="handleRegister(event)" class="space-y-4 hidden">
+                <div class="text-xs text-stone-500 mb-2">برای ساخت حساب کاربری، اطلاعات زیر را تکمبل کنید.</div>
+                <div>
+                    <label class="block text-xs font-semibold text-stone-700 mb-1">نام و نام خانوادگی</label>
+                    <input type="text" id="reg-name" placeholder="علی محمدی" required class="w-full px-4 py-2.5 rounded-xl border border-stone-300 focus:outline-none focus:border-brand-gold text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-stone-700 mb-1">شماره موبایل</label>
+                    <input type="tel" id="reg-phone" placeholder="09123456789" required class="w-full px-4 py-2.5 rounded-xl border border-stone-300 focus:outline-none focus:border-brand-gold text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-stone-700 mb-1">رمز عبور</label>
+                    <input type="password" id="reg-password" placeholder="حداقل ۶ کاراکتر" required minlength="6" class="w-full px-4 py-2.5 rounded-xl border border-stone-300 focus:outline-none focus:border-brand-gold text-sm">
+                </div>
+                <button type="submit" class="w-full bg-brand-gold hover:bg-brand-goldHover text-white font-medium py-3 rounded-xl transition text-sm shadow-md mt-2">ثبت نام و ایجاد حساب</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. CUSTOMER DASHBOARD MODAL -->
+    <div id="account-dashboard-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-brand-bg w-full max-w-3xl rounded-2xl p-6 sm:p-8 shadow-2xl relative border border-brand-border max-h-[90vh] overflow-y-auto">
+            <button onclick="closeAccountDashboard()" class="absolute top-4 left-4 text-stone-400 hover:text-stone-800 text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- Profile Info Header -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-stone-200 pb-6 mb-6 gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 bg-brand-gold text-white rounded-full flex items-center justify-center text-xl font-bold shadow-md">
+                        <span id="user-avatar-text">NE</span>
+                    </div>
+                    <div>
+                        <h3 id="user-display-name" class="text-xl font-bold text-brand-primary">حساب کاربری</h3>
+                        <p id="user-display-phone" class="text-xs text-stone-500 font-mono mt-0.5">09120000000</p>
+                    </div>
+                </div>
+                <button onclick="handleLogout()" class="text-xs bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-xl transition flex items-center gap-2 border border-red-200 font-semibold">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> خروج از حساب
+                </button>
+            </div>
+
+            <!-- Customer Orders Section -->
+            <div>
+                <h4 class="font-bold text-lg mb-4 text-brand-primary flex items-center gap-2">
+                    <i class="fa-solid fa-box text-brand-gold"></i> سفارش‌های من
+                </h4>
+                
+                <div id="customer-orders-list" class="space-y-4">
+                    <!-- Orders Rendered Dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. PRODUCT DETAIL MODAL -->
+    <div id="product-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-brand-bg w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl relative border border-brand-border max-h-[92vh] flex flex-col md:flex-row">
+            <button onclick="closeProductModal()" class="absolute top-4 left-4 z-10 bg-white/80 p-2 rounded-full text-stone-600 hover:text-black">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <!-- Product Image Side -->
+            <div class="md:w-1/2 bg-stone-100 relative min-h-[300px]">
+                <img id="modal-product-img" src="" alt="" class="w-full h-full object-cover">
+            </div>
+
+            <!-- Product Details Side -->
+            <div class="md:w-1/2 p-6 sm:p-8 flex flex-col justify-between overflow-y-auto">
+                <div>
+                    <div class="flex justify-between items-start mb-2">
+                        <span id="modal-product-cat" class="text-xs font-semibold text-brand-gold uppercase tracking-wider">دسته‌بندی</span>
+                        <span id="modal-product-stock" class="text-xs px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-medium">موجود در انبار</span>
+                    </div>
+                    <h2 id="modal-product-title" class="text-2xl font-bold text-brand-primary mb-3">نام محصول</h2>
+                    <div id="modal-product-price" class="text-xl font-black text-stone-900 mb-6">0 تومان</div>
+                    
+                    <p id="modal-product-desc" class="text-xs text-stone-600 leading-relaxed mb-6 font-light">توضیحات محصول...</p>
+
+                    <!-- Color Selector -->
+                    <div class="mb-5">
+                        <label class="block text-xs font-bold text-stone-700 mb-2">انتخاب رنگ:</label>
+                        <div id="modal-colors-container" class="flex flex-wrap gap-2"></div>
+                    </div>
+
+                    <!-- Size Selector -->
+                    <div class="mb-6">
+                        <label class="block text-xs font-bold text-stone-700 mb-2">انتخاب سایز:</label>
+                        <div id="modal-sizes-container" class="flex flex-wrap gap-2"></div>
+                    </div>
+                </div>
+
+                <!-- Add to Cart Action -->
+                <div class="pt-4 border-t border-stone-200">
+                    <button onclick="addToCartFromModal()" class="w-full bg-brand-primary hover:bg-black text-white py-3.5 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-lg">
+                        <i class="fa-solid fa-bag-shopping text-brand-gold"></i> افزودن به سبد خرید
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. CART DRAWER -->
+    <div id="cart-drawer" class="fixed inset-0 bg-black/50 z-50 hidden transition-opacity duration-300">
+        <div class="bg-brand-bg w-full max-w-md h-full float-left p-6 flex flex-col justify-between shadow-2xl relative">
+            <div>
+                <div class="flex justify-between items-center pb-4 border-b border-brand-border">
+                    <h3 class="text-lg font-bold text-brand-primary flex items-center gap-2">
+                        <i class="fa-solid fa-bag-shopping text-brand-gold"></i> سبد خرید شما
+                    </h3>
+                    <button onclick="toggleCartDrawer()" class="text-stone-400 hover:text-stone-800 text-lg"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+
+                <div id="cart-items-container" class="mt-4 space-y-4 max-h-[60vh] overflow-y-auto pr-1">
+                    <!-- Cart items rendered here -->
+                </div>
+            </div>
+
+            <!-- Cart Footer -->
+            <div class="border-t border-brand-border pt-4">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-xs text-stone-500 font-medium">مبلغ قابل پرداخت:</span>
+                    <span id="cart-total-price" class="text-lg font-black text-brand-primary">۰ تومان</span>
+                </div>
+                <button onclick="proceedToCheckout()" class="w-full bg-brand-gold hover:bg-brand-goldHover text-white py-3.5 rounded-xl font-bold transition shadow-md">
+                    تکمیل سفارش و پرداخت
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. CHECKOUT & ADDRESS MODAL -->
+    <div id="checkout-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-brand-bg w-full max-w-xl rounded-2xl p-6 sm:p-8 shadow-2xl relative border border-brand-border max-h-[90vh] overflow-y-auto">
+            <button onclick="closeCheckoutModal()" class="absolute top-4 left-4 text-stone-400 hover:text-stone-800 text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <h3 class="text-xl font-bold mb-4 text-brand-primary flex items-center gap-2">
+                <i class="fa-solid fa-truck-fast text-brand-gold"></i> آدرس و مشخصات تحویل‌گیرنده
+            </h3>
+
+            <form onsubmit="startGatewayPayment(event)" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-stone-700 mb-1">نام تحویل‌گیرنده</label>
+                        <input type="text" id="chk-name" required class="w-full px-4 py-2.5 rounded-xl border border-stone-300 focus:outline-none focus:border-brand-gold text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-stone-700 mb-1">شماره تماس</label>
+                        <input type="tel" id="chk-phone" required class="w-full px-4 py-2.5 rounded-xl border border-stone-300 focus:outline-none focus:border-brand-gold text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-stone-700 mb-1">کد پستی ۱۰ رقمی</label>
+                    <input type="text" id="chk-postal" required minlength="10" maxlength="10" placeholder="1234567890" class="w-full px-4 py-2.5 rounded-xl border border-stone-300 focus:outline-none focus:border-brand-gold text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-stone-700 mb-1">آدرس دقیق پستی</label>
+                    <textarea id="chk-address" rows="3" required placeholder="استان، شهر، خیابان اصلی، کوچه، پلاک، واحد..." class="w-full px-4 py-2.5 rounded-xl border border-stone-300 focus:outline-none focus:border-brand-gold text-sm"></textarea>
+                </div>
+
+                <div class="p-4 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-800 font-light">
+                    📦 سفارش شما پس از پرداخت، از طریق پست پیشتاز یا تیپاکس ارسال خواهد شد و کد رهگیری در حساب کاربری قرار می‌گیرد.
+                </div>
+
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl transition text-sm shadow-md">
+                    انتقال به درگاه پرداخت آنلاین شاپرک
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 6. SHAPARAK PAYMENT GATEWAY SIMULATION -->
+    <div id="gateway-modal" class="fixed inset-0 bg-stone-900 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl text-stone-800 border border-stone-300">
+            <!-- Shaparak Header -->
+            <div class="bg-sky-800 text-white p-4 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-credit-card text-amber-300 text-xl"></i>
+                    <div>
+                        <h4 class="text-sm font-bold">درگاه پرداخت الکترونیک شاپرک</h4>
+                        <p class="text-[10px] text-sky-200">NEOS SHOP - پرداخت امن</p>
+                    </div>
+                </div>
+                <div class="text-left font-mono text-xs bg-sky-900/60 px-2.5 py-1 rounded">
+                    زمان باقی‌مانده: <span id="gateway-timer" class="text-amber-300 font-bold">09:59</span>
+                </div>
+            </div>
+
+            <!-- Shaparak Form -->
+            <form onsubmit="completePayment(event)" class="p-6 space-y-4">
+                <div class="bg-stone-50 p-3 rounded-lg border border-stone-200 text-xs flex justify-between">
+                    <span>پذیرنده: <b>فروشگاه پوشاک NEOS</b></span>
+                    <span>مبلغ: <b id="gateway-amount" class="text-emerald-700 font-bold">0 تومان</b></span>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-stone-700 mb-1">شماره کارت (۱۶ رقمی)</label>
+                    <input type="text" maxlength="16" placeholder="6037-XXXX-XXXX-XXXX" required class="w-full px-3 py-2 border rounded-lg font-mono text-center tracking-widest text-sm">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-stone-700 mb-1">کد CVV2</label>
+                        <input type="password" maxlength="4" placeholder="123" required class="w-full px-3 py-2 border rounded-lg font-mono text-center text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-stone-700 mb-1">تاریخ انقضا (ماه/سال)</label>
+                        <div class="flex gap-1">
+                            <input type="text" placeholder="ماه" maxlength="2" required class="w-1/2 px-2 py-2 border rounded-lg font-mono text-center text-sm">
+                            <input type="text" placeholder="سال" maxlength="2" required class="w-1/2 px-2 py-2 border rounded-lg font-mono text-center text-sm">
                         </div>
                     </div>
                 </div>
 
-                <div id="adm-tab-products" class="hidden space-y-6">
+                <div>
+                    <label class="block text-xs font-semibold text-stone-700 mb-1">رمز پویا / دوم</label>
+                    <div class="flex gap-2">
+                        <input type="password" placeholder="••••••" required class="w-full px-3 py-2 border rounded-lg font-mono text-center text-sm">
+                        <button type="button" onclick="showToast('رمز پویا به شماره همراه خریدار پیامک شد.', 'success')" class="bg-stone-200 hover:bg-stone-300 text-xs px-3 rounded-lg whitespace-nowrap font-medium">دریافت رمز</button>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 pt-2">
+                    <button type="submit" class="w-2/3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition text-sm">پرداخت و ثبت سفارش</button>
+                    <button type="button" onclick="cancelPayment()" class="w-1/3 bg-stone-200 hover:bg-stone-300 text-stone-700 font-bold py-3 rounded-xl transition text-sm">انصراف</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 7. ADMIN PANEL MODAL / PAGE VIEW -->
+    <div id="admin-panel-modal" class="fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center p-3 sm:p-6 backdrop-blur-md">
+        <div class="bg-brand-bg w-full max-w-6xl h-[94vh] rounded-2xl overflow-hidden shadow-2xl flex flex-col border border-brand-border">
+            
+            <!-- Admin Header (Matching Brand Theme) -->
+            <div class="bg-stone-900 text-white px-6 py-4 flex justify-between items-center border-b border-stone-800">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-user-shield text-brand-gold text-2xl"></i>
+                    <div>
+                        <h3 class="text-lg font-bold">پنل مدیریت NEOS SHOP</h3>
+                        <p class="text-xs text-stone-400">مدیریت محصولات، سفارشات و انباردارای</p>
+                    </div>
+                </div>
+                <button onclick="closeAdminPanel()" class="bg-stone-800 hover:bg-stone-700 text-stone-300 px-4 py-2 rounded-xl text-xs transition">
+                    خروج از پنل <i class="fa-solid fa-xmark ml-1"></i>
+                </button>
+            </div>
+
+            <!-- Admin Navigation Tabs -->
+            <div class="bg-brand-accent px-6 py-3 border-b border-brand-border flex gap-4 text-xs font-bold">
+                <button id="admin-tab-products" onclick="switchAdminTab('products')" class="px-4 py-2 rounded-xl bg-brand-primary text-white transition">
+                    <i class="fa-solid fa-shirt ml-1"></i> مدیریت محصولات (<span id="admin-product-count">0</span>)
+                </button>
+                <button id="admin-tab-orders" onclick="switchAdminTab('orders')" class="px-4 py-2 rounded-xl text-stone-600 hover:bg-stone-200 transition">
+                    <i class="fa-solid fa-boxes-packing ml-1"></i> مدیریت سفارشات (<span id="admin-order-count">0</span>)
+                </button>
+            </div>
+
+            <!-- Admin Body View -->
+            <div class="p-6 overflow-y-auto flex-grow">
+                
+                <!-- PRODUCTS MANAGEMENT TAB -->
+                <div id="admin-view-products" class="space-y-6">
                     <div class="flex justify-between items-center">
-                        <h3 class="text-xl font-bold text-white">مدیریت محصولات</h3>
-                        <button onclick="openAddProductModal()" class="bg-warmgold hover:bg-amber-600 text-black font-bold text-xs px-4 py-2.5 rounded-xl transition-all shadow-md">
-                            <i class="fa-solid fa-plus ml-1"></i> افزودن لباس جدید
+                        <h4 class="font-bold text-lg text-brand-primary">لیست محصولات سیستم</h4>
+                        <button onclick="openProductEditorModal()" class="bg-brand-gold hover:bg-brand-goldHover text-white px-4 py-2.5 rounded-xl font-bold text-xs transition shadow-md flex items-center gap-2">
+                            <i class="fa-solid fa-plus"></i> افزودن محصول جدید
                         </button>
                     </div>
-                    <div class="bg-slate-800/80 rounded-2xl border border-slate-700 overflow-hidden">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-right text-xs">
-                                <thead class="bg-slate-950 text-slate-400">
-                                    <tr>
-                                        <th class="p-4">تصویر</th>
-                                        <th class="p-4">نام محصول</th>
-                                        <th class="p-4">دسته</th>
-                                        <th class="p-4">قیمت (تومان)</th>
-                                        <th class="p-4">مجموع موجودی</th>
-                                        <th class="p-4">عملیات</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="admin-products-table-body" class="divide-y divide-slate-700/60">
-                                    <!-- Dynamic product rows -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
 
-                <div id="adm-tab-orders" class="hidden space-y-6">
-                    <h3 class="text-xl font-bold text-white">مدیریت و پیگیری سفارشات مشتریان</h3>
-                    <div class="bg-slate-800/80 rounded-2xl border border-slate-700 overflow-hidden">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-right text-xs">
-                                <thead class="bg-slate-950 text-slate-400">
-                                    <tr>
-                                        <th class="p-4">کد سفارش</th>
-                                        <th class="p-4">مشتری</th>
-                                        <th class="p-4">تلفن</th>
-                                        <th class="p-4">مبلغ</th>
-                                        <th class="p-4">وضعیت سفارش</th>
-                                        <th class="p-4">کد رهگیری پستی</th>
-                                        <th class="p-4">جزئیات</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="admin-orders-table-body" class="divide-y divide-slate-700/60">
-                                    <!-- Dynamic orders -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="adm-tab-categories" class="hidden space-y-6 max-w-xl">
-                    <h3 class="text-xl font-bold text-white">دسته‌بندی‌ها</h3>
-                    <div class="flex gap-2">
-                        <input type="text" id="new-cat-input" placeholder="عنوان دسته جدید..." class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-xs text-white focus:outline-none flex-grow">
-                        <button onclick="addNewCategory()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-4 py-2 rounded-xl">افزودن</button>
-                    </div>
-                    <ul id="admin-categories-list" class="space-y-2">
-                        <!-- Dynamic list -->
-                    </ul>
-                </div>
-
-                <div id="adm-tab-approvals" class="hidden space-y-6">
-                    <h3 class="text-xl font-bold text-white">تایید یا رد ادمین‌های جدید</h3>
-                    <div id="super-admin-only-notice" class="hidden bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs p-4 rounded-xl">
-                        فقط سوپر ادمین اصلی اجازه تایید یا رد ادمین‌های جدید را دارد.
-                    </div>
-                    <div class="bg-slate-800/80 rounded-2xl border border-slate-700 overflow-hidden">
+                    <!-- Products Table -->
+                    <div class="overflow-x-auto bg-white rounded-xl border border-brand-border shadow-sm">
                         <table class="w-full text-right text-xs">
-                            <thead class="bg-slate-950 text-slate-400">
+                            <thead class="bg-stone-100 text-stone-700 font-bold border-b">
                                 <tr>
-                                    <th class="p-4">نام</th>
-                                    <th class="p-4">نام کاربری</th>
-                                    <th class="p-4">نقش</th>
-                                    <th class="p-4">وضعیت</th>
-                                    <th class="p-4">اقدام</th>
+                                    <th class="p-3">تصویر</th>
+                                    <th class="p-3">نام محصول</th>
+                                    <th class="p-3">دسته</th>
+                                    <th class="p-3">قیمت</th>
+                                    <th class="p-3">موجودی</th>
+                                    <th class="p-3">عملیات</th>
                                 </tr>
                             </thead>
-                            <tbody id="admin-approvals-table-body" class="divide-y divide-slate-700/60">
-                                <!-- Dynamic admins approval -->
+                            <tbody id="admin-products-table" class="divide-y divide-stone-100">
+                                <!-- Populated dynamically -->
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <div id="adm-tab-settings" class="hidden space-y-6 max-w-2xl">
-                    <h3 class="text-xl font-bold text-white">تنظیمات اصلی فروشگاه</h3>
-                    <div class="bg-slate-800/80 p-6 rounded-2xl border border-slate-700 space-y-4 text-xs">
-                        <div>
-                            <label class="block text-slate-300 mb-1">نام لوگوی برند</label>
-                            <input type="text" id="setting-logo-text" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white">
-                        </div>
-                        <div>
-                            <label class="block text-slate-300 mb-1">شعار و متن اسلایدر اصلی (Hero)</label>
-                            <input type="text" id="setting-hero-slogan" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white">
-                        </div>
-                        <div>
-                            <label class="block text-slate-300 mb-1">لینک تصویر بنر اصلی (URL)</label>
-                            <input type="text" id="setting-hero-banner" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white">
-                        </div>
-                        <div>
-                            <label class="block text-slate-300 mb-1">شماره تلفن پشتیبانی</label>
-                            <input type="text" id="setting-phone" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white">
-                        </div>
-                        <div>
-                            <label class="block text-slate-300 mb-1">آیدی اینستاگرام</label>
-                            <input type="text" id="setting-instagram" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white">
-                        </div>
-                        <button onclick="saveStoreSettings()" class="bg-warmgold hover:bg-amber-600 text-black font-bold py-3 px-6 rounded-xl transition-all">
-                            ذخیره تغییرات
-                        </button>
+                <!-- ORDERS MANAGEMENT TAB -->
+                <div id="admin-view-orders" class="space-y-6 hidden">
+                    <h4 class="font-bold text-lg text-brand-primary">لیست کلیه سفارشات کاربران</h4>
+                    <div id="admin-orders-container" class="space-y-4">
+                        <!-- Populated dynamically -->
                     </div>
                 </div>
-
-            </main>
-        </div>
-    </div>
-
-
-    <!-- ========================================== -->
-    <!-- MODALS & DRAWERS (Product, Cart, Auth, Admin Login) -->
-    <!-- ========================================== -->
-
-    <div id="product-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300 flex items-center justify-center p-4">
-        <div class="bg-white text-obsidian rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative p-6 md:p-8 transform scale-95 transition-transform duration-300" id="product-modal-content">
-            <button onclick="closeProductModal()" class="absolute top-5 left-5 text-slate-400 hover:text-black z-10 text-xl"><i class="fa-solid fa-xmark"></i></button>
-            <div id="product-modal-body" class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- Dynamically filled product data -->
             </div>
         </div>
     </div>
 
-    <div id="cart-drawer" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300">
-        <div id="cart-drawer-content" class="bg-white w-full max-w-md h-full p-6 flex flex-col justify-between absolute left-0 top-0 transform -translate-x-full transition-transform duration-300 shadow-2xl">
-            <div>
-                <div class="flex items-center justify-between border-b pb-4 mb-4">
-                    <h3 class="font-bold text-lg text-obsidian">سبد خرید شما</h3>
-                    <button onclick="toggleCartDrawer(false)" class="text-slate-400 hover:text-black"><i class="fa-solid fa-xmark text-xl"></i></button>
-                </div>
-                <div id="cart-items-container" class="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
-                    <!-- Dynamic cart items -->
-                </div>
-            </div>
-            
-            <div class="border-t pt-4 bg-white">
-                <div class="flex justify-between items-center mb-4 text-sm font-bold">
-                    <span class="text-slate-600">مجموع قابل پرداخت:</span>
-                    <span id="cart-total-price" class="text-lg text-obsidian">۰ تومان</span>
-                </div>
-                <button id="checkout-start-btn" onclick="openCheckoutModal()" class="w-full bg-obsidian text-white py-3.5 rounded-2xl font-bold text-sm hover:bg-slate-800 transition-all shadow-lg">
-                    تکمیل خرید و ثبت آدرس
-                </button>
-            </div>
-        </div>
-    </div>
+    <!-- 8. ADMIN ADD / EDIT PRODUCT MODAL -->
+    <div id="product-editor-modal" class="fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center p-4 backdrop-blur-md">
+        <div class="bg-brand-bg w-full max-w-2xl rounded-2xl p-6 sm:p-8 shadow-2xl relative border border-brand-border max-h-[90vh] overflow-y-auto">
+            <button onclick="closeProductEditorModal()" class="absolute top-4 left-4 text-stone-400 hover:text-stone-800 text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
 
-    <div id="checkout-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-xl w-full max-h-[90vh] overflow-y-auto p-6 md:p-8 shadow-2xl relative">
-            <button onclick="closeCheckoutModal()" class="absolute top-5 left-5 text-slate-400 hover:text-black text-xl"><i class="fa-solid fa-xmark"></i></button>
-            
-            <!-- Checkout Step Indicators -->
-            <div class="flex items-center justify-between mb-8 text-xs font-bold border-b pb-4">
-                <span id="step-ind-1" class="text-obsidian border-b-2 border-obsidian pb-1">۱. اطلاعات آدرس</span>
-                <span id="step-ind-2" class="text-slate-400">۲. درگاه پرداخت</span>
-                <span id="step-ind-3" class="text-slate-400">۳. صدور فاکتور</span>
-            </div>
+            <h3 id="editor-modal-title" class="text-xl font-bold mb-6 text-brand-primary border-b border-brand-border pb-3">افزودن محصول جدید</h3>
 
-            <!-- Step 1: Shipping Details Form -->
-            <div id="checkout-step-1" class="space-y-4">
-                <h4 class="font-bold text-base text-obsidian mb-2">اطلاعات تحویل‌گیرنده</h4>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <form onsubmit="saveProductFromAdmin(event)" class="space-y-4">
+                <input type="hidden" id="edit-prod-id">
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-slate-600 mb-1">نام و نام خانوادگی *</label>
-                        <input type="text" id="ship-name" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none focus:border-obsidian">
+                        <label class="block text-xs font-bold text-stone-700 mb-1">عنوان محصول</label>
+                        <input type="text" id="edit-prod-title" required placeholder="مثال: هودی اورسایز بلک" class="w-full px-3 py-2 rounded-xl border border-stone-300 focus:outline-none focus:border-brand-gold text-sm">
                     </div>
                     <div>
-                        <label class="block text-slate-600 mb-1">شماره همراه *</label>
-                        <input type="tel" id="ship-phone" placeholder="09123456789" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none focus:border-obsidian">
-                    </div>
-                    <div>
-                        <label class="block text-slate-600 mb-1">استان *</label>
-                        <input type="text" id="ship-province" value="تهران" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none focus:border-obsidian">
-                    </div>
-                    <div>
-                        <label class="block text-slate-600 mb-1">شهر *</label>
-                        <input type="text" id="ship-city" value="تهران" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none focus:border-obsidian">
-                    </div>
-                    <div class="sm:col-span-2">
-                        <label class="block text-slate-600 mb-1">آدرس دقیق پستی *</label>
-                        <textarea id="ship-address" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none focus:border-obsidian"></textarea>
-                    </div>
-                    <div>
-                        <label class="block text-slate-600 mb-1">کد پستی ۱۰ رقمی *</label>
-                        <input type="text" id="ship-postal" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none focus:border-obsidian">
-                    </div>
-                    <div>
-                        <label class="block text-slate-600 mb-1">روش ارسال</label>
-                        <select id="ship-method" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:outline-none focus:border-obsidian">
-                            <option value="پست پیشتاز">پست پیشتاز (رایگان)</option>
-                            <option value="تیپاکس">تیپاکس اکسپرس (پس‌کرایه)</option>
+                        <label class="block text-xs font-bold text-stone-700 mb-1">دسته‌بندی</label>
+                        <select id="edit-prod-cat" required class="w-full px-3 py-2 rounded-xl border border-stone-300 focus:outline-none focus:border-brand-gold text-sm bg-white">
+                            <option value="هودی و دورس">هودی و دورس</option>
+                            <option value="پافر و کاپشن">پافر و کاپشن</option>
+                            <option value="شلوار">شلوار</option>
+                            <option value="تیشرت">تیشرت</option>
                         </select>
                     </div>
                 </div>
-                <button onclick="goToPaymentGateway()" class="w-full bg-obsidian text-white font-bold py-3.5 rounded-xl text-sm hover:bg-slate-800 transition-all mt-4">
-                    انتقال به درگاه پرداخت آنلاین
-                </button>
-            </div>
 
-            <!-- Step 2: Simulated Iranian Bank Gateway (Shaparak) -->
-            <div id="checkout-step-2" class="hidden space-y-4">
-                <div class="bg-blue-900 text-white p-4 rounded-2xl flex items-center justify-between">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <p class="text-[10px] text-blue-200">شبکه پرداخت الکترونیک شاپرک</p>
-                        <h5 class="text-xs font-bold mt-1">درگاه پرداخت امن بانک سامان / ملی</h5>
-                    </div>
-                    <i class="fa-solid fa-credit-card text-2xl text-blue-300"></i>
-                </div>
-                <div class="text-center py-2 bg-slate-50 rounded-xl border border-dashed border-slate-300">
-                    <span class="text-xs text-slate-500">مبلغ فاکتور:</span>
-                    <span id="gateway-total-amount" class="font-black text-slate-900 text-base mr-2">۰ تومان</span>
-                </div>
-                <div class="space-y-3 text-xs">
-                    <div>
-                        <label class="block text-slate-600 mb-1">شماره کارت (۱۶ رقمی)</label>
-                        <input type="text" maxlength="19" placeholder="6037-9918-XXXX-XXXX" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 font-mono tracking-widest text-center focus:outline-none">
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-slate-600 mb-1">CVV2</label>
-                            <input type="password" maxlength="4" placeholder="***" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 font-mono text-center">
-                        </div>
-                        <div>
-                            <label class="block text-slate-600 mb-1">تاریخ انقضا (ماه / سال)</label>
-                            <div class="flex gap-1">
-                                <input type="text" maxlength="2" placeholder="08" class="w-1/2 bg-slate-50 border border-slate-300 rounded-xl p-3 font-mono text-center">
-                                <input type="text" maxlength="2" placeholder="05" class="w-1/2 bg-slate-50 border border-slate-300 rounded-xl p-3 font-mono text-center">
-                            </div>
-                        </div>
+                        <label class="block text-xs font-bold text-stone-700 mb-1">قیمت (تومان)</label>
+                        <input type="number" id="edit-prod-price" required placeholder="1450000" class="w-full px-3 py-2 rounded-xl border border-stone-300 focus:outline-none focus:border-brand-gold text-sm">
                     </div>
                     <div>
-                        <label class="block text-slate-600 mb-1">رمز پویا / دوم</label>
-                        <div class="flex gap-2">
-                            <input type="password" maxlength="8" placeholder="رمز پویا" class="flex-grow bg-slate-50 border border-slate-300 rounded-xl p-3 font-mono">
-                            <button type="button" onclick="triggerOtpTimer()" id="otp-btn" class="bg-slate-800 text-white text-[11px] px-3 rounded-xl hover:bg-slate-900">درخواست رمز پویا</button>
-                        </div>
+                        <label class="block text-xs font-bold text-stone-700 mb-1">موجودی انبار (عدد)</label>
+                        <input type="number" id="edit-prod-stock" required placeholder="15" class="w-full px-3 py-2 rounded-xl border border-stone-300 focus:outline-none focus:border-brand-gold text-sm">
                     </div>
                 </div>
-                <button onclick="processFinalPayment()" class="w-full bg-emerald-600 text-white font-bold py-3.5 rounded-xl text-sm hover:bg-emerald-700 transition-all shadow-md mt-4">
-                    <i class="fa-solid fa-lock ml-2"></i> پرداخت و ثبت نهایی سفارش
-                </button>
-            </div>
 
-            <!-- Step 3: Order Receipt Success -->
-            <div id="checkout-step-3" class="hidden text-center space-y-4 py-4">
-                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl">
-                    <i class="fa-solid fa-check"></i>
+                <div>
+                    <label class="block text-xs font-bold text-stone-700 mb-1">لینک تصویر محصول (URL)</label>
+                    <input type="url" id="edit-prod-img" required placeholder="https://images.unsplash.com/..." class="w-full px-3 py-2 rounded-xl border border-stone-300 focus:outline-none focus:border-brand-gold text-sm font-mono dir-ltr">
                 </div>
-                <h4 class="text-xl font-extrabold text-slate-900">پرداخت با موفقیت انجام شد!</h4>
-                <p class="text-xs text-slate-500">سفارش شما با موفقیت در سیستم نیوس ثبت شد و کد رهگیری زیر صادر گردید.</p>
-                <div class="bg-slate-100 p-4 rounded-2xl border text-center">
-                    <span class="text-xs text-slate-500 block">شماره پیگیری سفارش شما:</span>
-                    <span id="receipt-order-id" class="text-xl font-black text-obsidian tracking-wider">NEOS-XXXX</span>
-                </div>
-                <p class="text-[11px] text-slate-500">می‌توانید وضعیت سفارش خود را از بخش «حساب کاربری» پیگیری کنید.</p>
-                <button onclick="closeCheckoutModal(); openCustomerAuthModal();" class="w-full bg-obsidian text-white font-bold py-3.5 rounded-xl text-xs hover:bg-slate-800">
-                    مشاهده در حساب کاربری
-                </button>
-            </div>
-        </div>
-    </div>
 
-    <div id="customer-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300 flex items-center justify-center p-4">
-        <div class="bg-white text-obsidian rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 md:p-8 shadow-2xl relative">
-            <button onclick="closeCustomerModal()" class="absolute top-5 left-5 text-slate-400 hover:text-black text-xl"><i class="fa-solid fa-xmark"></i></button>
-
-            <!-- Customer Unauthenticated State -->
-            <div id="customer-auth-form" class="space-y-4">
-                <h3 class="text-xl font-bold text-obsidian border-b pb-3">ورود / ثبت‌نام حساب مشتری</h3>
-                <div class="text-xs space-y-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-slate-600 mb-1">شماره موبایل</label>
-                        <input type="tel" id="cust-login-phone" placeholder="09123456789" class="w-full bg-slate-50 border rounded-xl p-3 focus:outline-none">
+                        <label class="block text-xs font-bold text-stone-700 mb-1">رنگ‌ها (با کاما جدا کنید)</label>
+                        <input type="text" id="edit-prod-colors" placeholder="مشکی, کرم, طوسی" required class="w-full px-3 py-2 rounded-xl border border-stone-300 focus:outline-none focus:border-brand-gold text-sm">
                     </div>
                     <div>
-                        <label class="block text-slate-600 mb-1">رمز عبور</label>
-                        <input type="password" id="cust-login-pass" class="w-full bg-slate-50 border rounded-xl p-3 focus:outline-none">
+                        <label class="block text-xs font-bold text-stone-700 mb-1">سایزها (با کاما جدا کنید)</label>
+                        <input type="text" id="edit-prod-sizes" placeholder="S, M, L, XL" required class="w-full px-3 py-2 rounded-xl border border-stone-300 focus:outline-none focus:border-brand-gold text-sm">
                     </div>
-                    <button onclick="handleCustomerLogin()" class="w-full bg-obsidian text-white font-bold py-3.5 rounded-xl text-xs hover:bg-slate-800">
-                        ورود به حساب کاربری
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-stone-700 mb-1">توضیحات کامل محصول</label>
+                    <textarea id="edit-prod-desc" rows="4" required placeholder="پارچه دورس ۳ نخ پنبه، بدون آبرفت، مناسب فصل سرما..." class="w-full px-3 py-2 rounded-xl border border-stone-300 focus:outline-none focus:border-brand-gold text-sm"></textarea>
+                </div>
+
+                <div class="pt-2 flex gap-3">
+                    <button type="submit" class="w-full bg-brand-gold hover:bg-brand-goldHover text-white font-bold py-3 rounded-xl transition text-sm shadow-md">
+                        ذخیره اطلاعات محصول
                     </button>
                 </div>
-            </div>
-
-            <!-- Customer Authenticated Dashboard State -->
-            <div id="customer-dashboard-view" class="hidden space-y-6">
-                <div class="flex justify-between items-center border-b pb-4">
-                    <div>
-                        <h3 class="text-lg font-bold text-obsidian">پروفایل کاربری</h3>
-                        <p id="cust-phone-display" class="text-xs text-slate-500">تلفن: -</p>
-                    </div>
-                    <button onclick="logoutCustomer()" class="text-xs text-red-500 hover:underline">خروج از حساب</button>
-                </div>
-
-                <h4 class="font-bold text-sm text-slate-800">تاریخچه و پیگیری سفارشات شما:</h4>
-                <div id="customer-orders-list" class="space-y-3 max-h-80 overflow-y-auto">
-                    <!-- Dynamic customer orders -->
-                </div>
-            </div>
+            </form>
         </div>
     </div>
 
-    <div id="admin-auth-modal" class="fixed inset-0 z-[80] bg-slate-950 backdrop-blur-md hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 text-slate-100 rounded-3xl max-w-md w-full p-8 shadow-2xl space-y-6">
-            <div class="text-center">
-                <span class="bg-warmgold/20 text-warmgold text-[10px] font-bold px-3 py-1 rounded-full uppercase">Secure Gateway</span>
-                <h3 class="text-2xl font-black text-white mt-2">ورود به پنل ادمین</h3>
-                <p class="text-xs text-slate-400 mt-1">ویژه مدیریت ارشد و دسترسی‌های مجاز نیوس</p>
-            </div>
-
-            <div class="space-y-3 text-xs">
-                <div>
-                    <label class="block text-slate-400 mb-1">نام کاربری ادمین</label>
-                    <input type="text" id="adm-username-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-warmgold">
-                </div>
-                <div>
-                    <label class="block text-slate-400 mb-1">رمز عبور</label>
-                    <input type="password" id="adm-password-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:outline-none focus:border-warmgold">
-                </div>
-                <div id="admin-reg-extra" class="hidden space-y-3">
-                    <div>
-                        <label class="block text-slate-400 mb-1">نام کامل</label>
-                        <input type="text" id="adm-fullname-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white">
-                    </div>
-                </div>
-                <button id="admin-auth-submit-btn" onclick="submitAdminAuth()" class="w-full bg-warmgold text-black font-extrabold py-3.5 rounded-xl text-xs hover:bg-amber-500 transition-all">
-                    ورود به پنل مدیریت
-                </button>
-            </div>
-
-            <div class="text-center border-t border-slate-800 pt-4">
-                <button onclick="toggleAdminAuthMode()" id="admin-auth-toggle-btn" class="text-xs text-slate-400 hover:text-white">
-                    ثبت‌نام ادمین جدید (درخواست دسترسی)
-                </button>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- ========================================== -->
-    <!-- JAVASCRIPT APPLICATION LOGIC              -->
-    <!-- ========================================== -->
     <script>
-        const STORAGE_KEY = 'neos_luxury_store_v3';
-
-        // Pre-populated initial mock data matching luxury Iranian streetwear
-        const DEFAULT_INITIAL_DATA = {
-            categories: ["همه", "هودی و دورس", "تیشرت و پولوشرت", "شلوار و کارگو", "پالتو و کاپشن"],
-            products: [
-                {
-                    id: "prod_1",
-                    name: "هودی اوورسایز سنگین مونوکروم 01",
-                    category: "هودی و دورس",
-                    price: 2450000,
-                    description: "پارچه دورس ۳ نخ پنبه سنگین با گرماژ ۴۵۰ گرم، تن‌خور بسیار عالی اوورسایز، کلاه دو لایه و جیب کانگورویی مخفی.",
-                    image: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=80",
-                    colors: ["مشکی مات", "کرم استخوانی", "خاکستری ذغالی"],
-                    sizes: ["S", "M", "L", "XL", "XXL"],
-                    variants: {
-                        "مشکی مات_S": 10, "مشکی مات_M": 15, "مشکی مات_L": 8, "مشکی مات_XL": 4, "مشکی مات_XXL": 0,
-                        "کرم استخوانی_S": 5, "کرم استخوانی_M": 12, "کرم استخوانی_L": 7, "کرم استخوانی_XL": 2, "کرم استخوانی_XXL": 0,
-                        "خاکستری ذغالی_S": 8, "خاکستری ذغالی_M": 10, "خاکستری ذغالی_L": 6, "خاکستری ذغالی_XL": 3, "خاکستری ذغالی_XXL": 0
-                    }
-                },
-                {
-                    id: "prod_2",
-                    name: "تیشرت بیسیک سنگین لایت 02",
-                    category: "تیشرت و پولوشرت",
-                    price: 1150000,
-                    description: "۱۰۰٪ پنبه سوپر شانه شده، چاپ مینیمال سینه، یقه کشباف فشرده بدون دفرمه شدن در شستشو.",
-                    image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80",
-                    colors: ["سفید استخوانی", "مشکی مات"],
-                    sizes: ["M", "L", "XL"],
-                    variants: {
-                        "سفید استخوانی_M": 20, "سفید استخوانی_L": 18, "سفید استخوانی_XL": 10,
-                        "مشکی مات_M": 25, "مشکی مات_L": 14, "مشکی مات_XL": 5
-                    }
-                },
-                {
-                    id: "prod_3",
-                    name: "شلوار کارگو چند جیب تاکتیکال",
-                    category: "شلوار و کارگو",
-                    price: 2850000,
-                    description: "پارچه کتان بنگال با دوام بالا، دارای ۶ جیب کاربردی، بندهای تنظیم دمپا و برش آزاد استریت.",
-                    image: "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=800&q=80",
-                    colors: ["مشکی مات", "زیتونی تیره"],
-                    sizes: ["M", "L", "XL", "XXL"],
-                    variants: {
-                        "مشکی مات_M": 8, "مشکی مات_L": 12, "مشکی مات_XL": 6, "مشکی مات_XXL": 2,
-                        "زیتونی تیره_M": 5, "زیتونی تیره_L": 7, "زیتونی تیره_XL": 4, "زیتونی تیره_XXL": 1
-                    }
-                },
-                {
-                    id: "prod_4",
-                    name: "پالتو مینیمال اورسایز زمستانه",
-                    category: "پالتو و کاپشن",
-                    price: 4900000,
-                    description: "پارچه فوتر پشمی با آستر ساتن درجه یک، دکمه‌های استخوان طبیعی، استایل فوق‌العاده شیک لوکس.",
-                    image: "https://images.unsplash.com/photo-1539533018447-63fcce2678e3?auto=format&fit=crop&w=800&q=80",
-                    colors: ["شتری لوکس", "مشکی مات"],
-                    sizes: ["M", "L", "XL"],
-                    variants: {
-                        "شتری لوکس_M": 4, "شتری لوکس_L": 6, "شتری لوکس_XL": 2,
-                        "مشکی مات_M": 3, "مشکی مات_L": 5, "مشکی مات_XL": 1
-                    }
-                }
-            ],
-            orders: [],
-            admins: [], // Populated on first registration (First becomes Super Admin)
-            storeSettings: {
-                shopName: "NEOS SHOP",
-                heroSlogan: "لوکس‌ترین استریت‌ویر مینیمال ایرانی",
-                heroBannerUrl: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1600&q=80",
-                phone: "021-91000000",
-                instagram: "@neos_store"
+        /* ==========================================================================
+           STATE MANAGEMENT & LOCAL STORAGE INITIALIZATION
+           ========================================================================== */
+        
+        const DEFAULT_PRODUCTS = [
+            {
+                id: "p1",
+                title: "هودی اورسایز نئوس مدل Minimal",
+                category: "هودی و دورس",
+                price: 1850000,
+                stock: 12,
+                colors: ["مشکی", "کرم", "طوسی"],
+                sizes: ["M", "L", "XL"],
+                image: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=800&auto=format&fit=crop",
+                description: "تهیه شده از بهترین پارچه دورس ۳ نخ داخل کرک‌دار با ضمانت عدم آبرفت و رنگ‌دهی. الگو و دوخت اورسایز بر اساس استاندارد جهانی."
+            },
+            {
+                id: "p2",
+                title: "پافر جیر لوکس زمستانه NEOS",
+                category: "پافر و کاپشن",
+                price: 3450000,
+                stock: 7,
+                colors: ["شکلاتی", "مشکی"],
+                sizes: ["M", "L", "XL"],
+                image: "https://images.unsplash.com/photo-1544441893-675973e31985?q=80&w=800&auto=format&fit=crop",
+                description: "پافر با لایه داخلی الیاف ضدحساسیت فوق‌العاده گرم و رویه جیر مات مرغوب. مقاوم در برابر نفوذ آب و باد."
+            },
+            {
+                id: "p3",
+                title: "شلوار اسلش مام استایل کتان",
+                category: "شلوار",
+                price: 1250000,
+                stock: 15,
+                colors: ["کرم روشن", "مشکی", "زیتونی"],
+                sizes: ["30", "32", "34", "36"],
+                image: "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?q=80&w=800&auto=format&fit=crop",
+                description: "شلوار کتان کش سنگ‌شور شده با فیت مام استایل مدرن و جیب‌های بزرگ. مناسب ست کردن با انواع دورس و تیشرت."
+            },
+            {
+                id: "p4",
+                title: "تیشرت سنگ‌شور لوکس Heavy Cotton",
+                category: "تیشرت",
+                price: 890000,
+                stock: 20,
+                colors: ["خاکستری", "سفید نوری", "مشکی"],
+                sizes: ["S", "M", "L", "XL"],
+                image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=800&auto=format&fit=crop",
+                description: "تیشرت ۱۰۰٪ پنبه سنگین با گرماژ ۲۴۰ گرم. دارای یقه کشبافت محکم و تن‌خور بسیار راحت و جذاب."
             }
+        ];
+
+        let state = {
+            products: JSON.parse(localStorage.getItem('neos_products')) || DEFAULT_PRODUCTS,
+            users: JSON.parse(localStorage.getItem('neos_users')) || [],
+            currentUser: JSON.parse(localStorage.getItem('neos_current_user')) || null,
+            cart: JSON.parse(localStorage.getItem('neos_cart')) || [],
+            orders: JSON.parse(localStorage.getItem('neos_orders')) || [],
+            selectedCategory: 'all',
+            selectedModalProduct: null,
+            selectedColor: '',
+            selectedSize: '',
+            activeAdminTab: 'products'
         };
 
-        // App State Manager
-        let appState = {
-            categories: [],
-            products: [],
-            orders: [],
-            admins: [],
-            storeSettings: {},
-            currentCategory: "همه",
-            searchQuery: "",
-            cart: [],
-            currentCustomerPhone: null,
-            currentAdmin: null,
-            adminModeIsRegister: false
-        };
-
-        window.onload = function() {
-            loadFromStorage();
-            initRouter();
-            window.addEventListener('hashchange', initRouter);
-            renderPublicUI();
-        };
-
-        function loadFromStorage() {
-            const stored = localStorage.getItem(STORAGE_KEY);
-            if (stored) {
-                try {
-                    const parsed = JSON.parse(stored);
-                    appState.categories = parsed.categories || DEFAULT_INITIAL_DATA.categories;
-                    appState.products = parsed.products || DEFAULT_INITIAL_DATA.products;
-                    appState.orders = parsed.orders || [];
-                    appState.admins = parsed.admins || [];
-                    appState.storeSettings = parsed.storeSettings || DEFAULT_INITIAL_DATA.storeSettings;
-                } catch (e) {
-                    console.error("Storage error, resetting to default.", e);
-                    appState = { ...DEFAULT_INITIAL_DATA, cart: [] };
-                }
-            } else {
-                appState = { ...DEFAULT_INITIAL_DATA, cart: [] };
-                saveToStorage();
-            }
-        }
-
+        // Save data to localStorage
         function saveToStorage() {
-            const dataToSave = {
-                categories: appState.categories,
-                products: appState.products,
-                orders: appState.orders,
-                admins: appState.admins,
-                storeSettings: appState.storeSettings
-            };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+            localStorage.setItem('neos_products', JSON.stringify(state.products));
+            localStorage.setItem('neos_users', JSON.stringify(state.users));
+            localStorage.setItem('neos_current_user', JSON.stringify(state.currentUser));
+            localStorage.setItem('neos_cart', JSON.stringify(state.cart));
+            localStorage.setItem('neos_orders', JSON.stringify(state.orders));
         }
 
-        function initRouter() {
-            const hash = window.location.hash;
-            const publicView = document.getElementById('public-app-view');
-            const adminView = document.getElementById('admin-app-view');
-            const adminAuthModal = document.getElementById('admin-auth-modal');
-
-            if (hash === '#admin' || hash.startsWith('#admin')) {
-                publicView.classList.add('hidden');
-                adminView.classList.remove('hidden');
-                
-                // Check Admin Session
-                if (!appState.currentAdmin) {
-                    adminAuthModal.classList.remove('hidden');
-                    adminAuthModal.classList.add('flex');
-                } else {
-                    adminAuthModal.classList.add('hidden');
-                    adminAuthModal.classList.remove('flex');
-                    renderAdminDashboard();
-                }
-            } else {
-                publicView.classList.remove('hidden');
-                adminView.classList.add('hidden');
-                adminAuthModal.classList.add('hidden');
-            }
+        // Helper for Farsi Prices
+        function formatPrice(num) {
+            return new Intl.NumberFormat('fa-IR').format(num) + ' تومان';
         }
 
-        function showToast(message, type = 'info') {
+        // Toast Notification Function (Replaces alert)
+        function showToast(msg, type = 'info') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             
-            let bg = 'bg-obsidian text-white';
-            if (type === 'success') bg = 'bg-emerald-600 text-white';
-            if (type === 'error') bg = 'bg-red-600 text-white';
-
-            toast.className = `${bg} text-xs font-medium px-4 py-3 rounded-2xl shadow-xl flex items-center justify-between transition-all duration-300 transform translate-y-2 pointer-events-auto`;
-            toast.innerHTML = `<span>${message}</span><button onclick="this.parentElement.remove()" class="mr-3 opacity-70 hover:opacity-100"><i class="fa-solid fa-xmark"></i></button>`;
+            const bgColor = type === 'success' ? 'bg-emerald-800' : type === 'error' ? 'bg-rose-800' : 'bg-stone-900';
+            toast.className = `${bgColor} text-white text-xs py-3 px-5 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300 transform translate-y-2 pointer-events-auto border border-stone-700`;
+            toast.innerHTML = `
+                <i class="${type === 'success' ? 'fa-solid fa-circle-check text-emerald-400' : type === 'error' ? 'fa-solid fa-triangle-exclamation text-rose-400' : 'fa-solid fa-circle-info text-brand-gold'} text-base"></i>
+                <span>${msg}</span>
+            `;
             
             container.appendChild(toast);
             setTimeout(() => {
-                toast.classList.add('opacity-0', '-translate-y-2');
+                toast.classList.add('opacity-0', 'translate-y-4');
                 setTimeout(() => toast.remove(), 300);
             }, 3500);
         }
 
-        function renderPublicUI() {
-            // Apply Settings
-            document.getElementById('brand-logo-text').innerText = appState.storeSettings.shopName || "NEOS";
-            document.getElementById('hero-slogan-text').innerText = appState.storeSettings.heroSlogan || "";
-            document.getElementById('hero-banner-img').src = appState.storeSettings.heroBannerUrl || "";
-            document.getElementById('drawer-phone').innerText = appState.storeSettings.phone || "";
-            document.getElementById('drawer-instagram').innerText = appState.storeSettings.instagram || "";
-            document.getElementById('footer-phone').innerText = appState.storeSettings.phone || "";
-            document.getElementById('footer-instagram').innerText = appState.storeSettings.instagram || "";
+        /* ==========================================================================
+           ROUTER & INITIAL RENDER
+           ========================================================================== */
+        
+        window.addEventListener('load', () => {
+            saveToStorage();
+            renderApp();
+            checkHashRoute();
+        });
 
-            // Render Categories Chips
-            const chipsContainer = document.getElementById('category-chips');
-            chipsContainer.innerHTML = appState.categories.map(cat => {
-                const isActive = appState.currentCategory === cat;
-                return `
-                    <button onclick="filterCategory('${cat}')" class="px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${isActive ? 'bg-obsidian text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">
-                        ${cat}
-                    </button>
-                `;
-            }).join('');
+        window.addEventListener('hashchange', checkHashRoute);
 
-            renderProducts();
+        function checkHashRoute() {
+            if (window.location.hash === '#admin' || window.location.pathname.endsWith('/admin')) {
+                openAdminPanel();
+            }
+        }
+
+        function renderApp() {
+            renderCategoryPills();
+            renderProductsGrid();
             updateCartBadge();
+            updateUserBadge();
         }
 
-        function filterCategory(catName) {
-            appState.currentCategory = catName;
-            renderPublicUI();
+        /* ==========================================================================
+           PRODUCT GRID & RENDERING
+           ========================================================================== */
+        
+        function renderCategoryPills() {
+            const categories = ['all', 'هودی و دورس', 'پافر و کاپشن', 'شلوار', 'تیشرت'];
+            const container = document.getElementById('category-pills');
+            
+            container.innerHTML = categories.map(cat => `
+                <button onclick="filterByCategory('${cat}')" 
+                    class="px-4 py-2 rounded-full text-xs font-semibold transition ${state.selectedCategory === cat ? 'bg-brand-primary text-white shadow-md' : 'bg-brand-accent text-stone-600 hover:bg-stone-200'}">
+                    ${cat === 'all' ? 'همه محصولات' : cat}
+                </button>
+            `).join('');
         }
 
-        function handleSearch(query) {
-            appState.searchQuery = query.trim().toLowerCase();
-            renderProducts();
+        function filterByCategory(cat) {
+            state.selectedCategory = cat;
+            renderCategoryPills();
+            renderProductsGrid();
         }
 
-        function resetToHome() {
-            appState.currentCategory = "همه";
-            appState.searchQuery = "";
-            renderPublicUI();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function renderProducts() {
-            const grid = document.getElementById('products-grid');
-            const sortVal = document.getElementById('sort-select').value;
-
-            let filtered = appState.products.filter(p => {
-                const matchesCat = (appState.currentCategory === "همه") || (p.category === appState.currentCategory);
-                const matchesSearch = !appState.searchQuery || p.name.toLowerCase().includes(appState.searchQuery) || p.description.toLowerCase().includes(appState.searchQuery);
-                return matchesCat && matchesSearch;
-            });
-
-            // Sorting logic
-            if (sortVal === 'price-asc') filtered.sort((a,b) => a.price - b.price);
-            if (sortVal === 'price-desc') filtered.sort((a,b) => b.price - a.price);
-
-            document.getElementById('catalog-count-badge').innerText = filtered.length;
+        function renderProductsGrid() {
+            const container = document.getElementById('products-grid');
+            const filtered = state.selectedCategory === 'all' 
+                ? state.products 
+                : state.products.filter(p => p.category === state.selectedCategory);
 
             if (filtered.length === 0) {
-                grid.innerHTML = `
-                    <div class="col-span-full py-16 text-center text-slate-400">
-                        <i class="fa-solid fa-shirt text-4xl mb-3 block opacity-40"></i>
-                        <p class="text-xs">هیچ محصولی مطابق با جستجوی شما پیدا نشد.</p>
-                    </div>
-                `;
+                container.innerHTML = `<div class="col-span-full text-center py-12 text-stone-400 text-sm">محصولی در این دسته‌بندی یافت نشد.</div>`;
                 return;
             }
 
-            grid.innerHTML = filtered.map(p => {
-                const totalStock = Object.values(p.variants || {}).reduce((a, b) => a + b, 0);
-                const isOutOfStock = totalStock <= 0;
-
-                return `
-                    <div class="bg-white rounded-2xl border border-slate-200/70 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group cursor-pointer" onclick="openProductModal('${p.id}')">
-                        <div class="relative aspect-[3/4] bg-slate-100 overflow-hidden">
-                            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://placehold.co/600x800/1e293b/ffffff?text=NEOS+APPAREL'">
-                            ${isOutOfStock ? '<span class="absolute top-3 right-3 bg-red-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">ناموجود</span>' : ''}
-                            <span class="absolute bottom-3 right-3 bg-white/90 backdrop-blur-md text-obsidian text-[10px] font-medium px-2.5 py-1 rounded-full">${p.category}</span>
+            container.innerHTML = filtered.map(product => `
+                <div class="bg-brand-card rounded-2xl overflow-hidden border border-brand-border shadow-sm hover:shadow-xl transition-all duration-300 group flex flex-col justify-between">
+                    <div class="relative overflow-hidden cursor-pointer" onclick="openProductModal('${product.id}')">
+                        <img src="${product.image}" alt="${product.title}" class="w-full h-72 object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute top-3 right-3 bg-brand-bg/90 backdrop-blur-sm text-stone-800 text-[10px] font-bold px-2.5 py-1 rounded-full border border-stone-200">
+                            ${product.category}
                         </div>
-                        <div class="p-4 flex-grow flex flex-col justify-between">
-                            <div>
-                                <h4 class="font-bold text-xs sm:text-sm text-slate-900 group-hover:text-warmgold transition-colors line-clamp-1">${p.name}</h4>
-                                <div class="flex items-center gap-1 mt-1 text-[10px] text-slate-400">
-                                    <span>رنگ‌ها: ${p.colors.join('، ')}</span>
-                                </div>
-                            </div>
-                            <div class="mt-4 flex items-center justify-between border-t pt-3">
-                                <span class="font-black text-xs sm:text-sm text-obsidian">${formatPrice(p.price)} تومان</span>
-                                <button class="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-obsidian group-hover:text-white flex items-center justify-center transition-colors">
-                                    <i class="fa-solid fa-arrow-left text-xs"></i>
-                                </button>
-                            </div>
+                        ${product.stock < 5 ? `<div class="absolute bottom-3 right-3 bg-rose-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">تنها ${product.stock} عدد باقی مانده</div>` : ''}
+                    </div>
+                    <div class="p-5 flex flex-col justify-between flex-grow">
+                        <div>
+                            <h4 class="font-bold text-sm text-brand-primary mb-2 line-clamp-1 cursor-pointer hover:text-brand-gold transition" onclick="openProductModal('${product.id}')">${product.title}</h4>
+                            <p class="text-xs text-stone-500 font-light line-clamp-2 mb-4">${product.description}</p>
+                        </div>
+                        <div class="flex justify-between items-center border-t border-stone-100 pt-3">
+                            <span class="font-black text-brand-primary text-sm">${formatPrice(product.price)}</span>
+                            <button onclick="openProductModal('${product.id}')" class="bg-brand-accent hover:bg-brand-primary hover:text-white text-stone-800 p-2.5 rounded-xl transition text-xs flex items-center gap-1 font-semibold">
+                                <i class="fa-solid fa-cart-plus text-brand-gold"></i> خرید
+                            </button>
                         </div>
                     </div>
-                `;
-            }).join('');
+                </div>
+            `).join('');
         }
 
-        let activeProductModalData = null;
-        let selectedColor = null;
-        let selectedSize = null;
-
-        function openProductModal(productId) {
-            const product = appState.products.find(p => p.id === productId);
+        /* ==========================================================================
+           PRODUCT MODAL
+           ========================================================================== */
+        
+        function openProductModal(id) {
+            const product = state.products.find(p => p.id === id);
             if (!product) return;
 
-            activeProductModalData = product;
-            selectedColor = product.colors[0] || null;
-            selectedSize = product.sizes[0] || null;
+            state.selectedModalProduct = product;
+            state.selectedColor = product.colors[0] || '';
+            state.selectedSize = product.sizes[0] || '';
 
-            const modal = document.getElementById('product-modal');
-            const body = document.getElementById('product-modal-body');
+            document.getElementById('modal-product-img').src = product.image;
+            document.getElementById('modal-product-cat').innerText = product.category;
+            document.getElementById('modal-product-title').innerText = product.title;
+            document.getElementById('modal-product-price').innerText = formatPrice(product.price);
+            document.getElementById('modal-product-desc').innerText = product.description;
+            
+            const stockBadge = document.getElementById('modal-product-stock');
+            if (product.stock > 0) {
+                stockBadge.className = "text-xs px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-medium";
+                stockBadge.innerText = `موجود در انبار (${product.stock} عدد)`;
+            } else {
+                stockBadge.className = "text-xs px-2.5 py-1 rounded-full bg-rose-100 text-rose-800 font-medium";
+                stockBadge.innerText = "ناموجود";
+            }
 
-            renderProductModalContent();
+            // Render Colors
+            document.getElementById('modal-colors-container').innerHTML = product.colors.map(color => `
+                <button onclick="selectColor('${color}')" class="color-pill px-3 py-1.5 rounded-lg border text-xs font-medium transition ${state.selectedColor === color ? 'border-brand-gold bg-amber-50 text-stone-900 font-bold' : 'border-stone-200 text-stone-600'}">
+                    ${color}
+                </button>
+            `).join('');
 
-            modal.classList.remove('opacity-0', 'pointer-events-none');
-            document.getElementById('product-modal-content').classList.remove('scale-95');
+            // Render Sizes
+            document.getElementById('modal-sizes-container').innerHTML = product.sizes.map(size => `
+                <button onclick="selectSize('${size}')" class="size-pill px-3 py-1.5 rounded-lg border text-xs font-medium transition ${state.selectedSize === size ? 'border-brand-gold bg-amber-50 text-stone-900 font-bold' : 'border-stone-200 text-stone-600'}">
+                    ${size}
+                </button>
+            `).join('');
+
+            document.getElementById('product-modal').classList.remove('hidden');
+            document.body.classList.add('modal-active');
         }
 
-        function renderProductModalContent() {
-            const p = activeProductModalData;
-            const body = document.getElementById('product-modal-body');
-
-            const currentVariantKey = `${selectedColor}_${selectedSize}`;
-            const currentStock = (p.variants && p.variants[currentVariantKey] !== undefined) ? p.variants[currentVariantKey] : 0;
-            const isOutOfStock = currentStock <= 0;
-
-            body.innerHTML = `
-                <div class="aspect-[3/4] rounded-2xl overflow-hidden bg-slate-100">
-                    <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x800/1e293b/ffffff?text=NEOS'">
-                </div>
-                <div class="flex flex-col justify-between space-y-4">
-                    <div>
-                        <span class="text-[11px] font-bold text-warmgold tracking-wider">${p.category}</span>
-                        <h2 class="text-xl font-black text-obsidian mt-1">${p.name}</h2>
-                        <p class="text-lg font-black text-slate-800 mt-2">${formatPrice(p.price)} <span class="text-xs font-normal">تومان</span></p>
-                        <p class="text-xs text-slate-500 leading-relaxed mt-3">${p.description}</p>
-                    </div>
-
-                    <!-- Color Swatches -->
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-2">انتخاب رنگ: <span class="text-obsidian font-normal">${selectedColor}</span></label>
-                        <div class="flex flex-wrap gap-2">
-                            ${p.colors.map(c => `
-                                <button onclick="selectModalColor('${c}')" class="px-3 py-1.5 rounded-xl text-xs border ${selectedColor === c ? 'bg-obsidian text-white border-obsidian font-bold' : 'bg-white text-slate-700 border-slate-200'}">
-                                    ${c}
-                                </button>
-                            `).join('')}
-                        </div>
-                    </div>
-
-                    <!-- Size Swatches -->
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-2">انتخاب سایز: <span class="text-obsidian font-normal">${selectedSize}</span></label>
-                        <div class="flex flex-wrap gap-2">
-                            ${p.sizes.map(s => `
-                                <button onclick="selectModalSize('${s}')" class="w-10 h-10 rounded-xl text-xs border font-mono font-bold ${selectedSize === s ? 'bg-obsidian text-white border-obsidian' : 'bg-white text-slate-700 border-slate-200'}">
-                                    ${s}
-                                </button>
-                            `).join('')}
-                        </div>
-                    </div>
-
-                    <!-- Live Variant Stock Badge -->
-                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex items-center justify-between text-xs">
-                        <span class="text-slate-600">موجودی رنگ و سایز انتخابی:</span>
-                        ${isOutOfStock ? 
-                            '<span class="text-red-600 font-bold bg-red-100 px-2 py-0.5 rounded">ناموجود</span>' : 
-                            `<span class="text-emerald-600 font-bold bg-emerald-100 px-2 py-0.5 rounded">${currentStock} عدد در انبار</span>`}
-                    </div>
-
-                    <!-- Action Button -->
-                    <button onclick="addToCartFromModal()" ${isOutOfStock ? 'disabled' : ''} class="w-full py-4 rounded-2xl font-bold text-xs sm:text-sm transition-all shadow-lg ${isOutOfStock ? 'bg-slate-300 text-slate-500 cursor-not-allowed' : 'bg-obsidian text-white hover:bg-slate-800'}">
-                        ${isOutOfStock ? 'ناموجود در انبار' : 'افزودن به سبد خرید'}
-                    </button>
-                </div>
-            `;
+        function selectColor(color) {
+            state.selectedColor = color;
+            openProductModal(state.selectedModalProduct.id);
         }
 
-        function selectModalColor(color) {
-            selectedColor = color;
-            renderProductModalContent();
-        }
-
-        function selectModalSize(size) {
-            selectedSize = size;
-            renderProductModalContent();
+        function selectSize(size) {
+            state.selectedSize = size;
+            openProductModal(state.selectedModalProduct.id);
         }
 
         function closeProductModal() {
-            document.getElementById('product-modal').classList.add('opacity-0', 'pointer-events-none');
+            document.getElementById('product-modal').classList.add('hidden');
+            document.body.classList.remove('modal-active');
         }
 
+        /* ==========================================================================
+           CART SYSTEM
+           ========================================================================== */
+        
         function addToCartFromModal() {
-            if (!activeProductModalData || !selectedColor || !selectedSize) return;
+            const p = state.selectedModalProduct;
+            if (!p || p.stock <= 0) {
+                showToast('این محصول متأسفانه موجود نیست.', 'error');
+                return;
+            }
 
-            const variantKey = `${selectedColor}_${selectedSize}`;
-            const availableStock = activeProductModalData.variants[variantKey] || 0;
-
-            const existingIndex = appState.cart.findIndex(i => i.productId === activeProductModalData.id && i.color === selectedColor && i.size === selectedSize);
-
+            const existingIndex = state.cart.findIndex(i => i.id === p.id && i.color === state.selectedColor && i.size === state.selectedSize);
+            
             if (existingIndex > -1) {
-                if (appState.cart[existingIndex].quantity + 1 > availableStock) {
-                    showToast('حداکثر موجودی این رنگ و سایز در سبد شما قرار دارد.', 'error');
+                if (state.cart[existingIndex].qty + 1 > p.stock) {
+                    showToast('تعداد درخواستی بیشتر از موجودی انبار است.', 'error');
                     return;
                 }
-                appState.cart[existingIndex].quantity += 1;
+                state.cart[existingIndex].qty += 1;
             } else {
-                appState.cart.push({
-                    productId: activeProductModalData.id,
-                    name: activeProductModalData.name,
-                    price: activeProductModalData.price,
-                    image: activeProductModalData.image,
-                    color: selectedColor,
-                    size: selectedSize,
-                    quantity: 1
+                state.cart.push({
+                    id: p.id,
+                    title: p.title,
+                    price: p.price,
+                    image: p.image,
+                    color: state.selectedColor,
+                    size: state.selectedSize,
+                    qty: 1
                 });
             }
 
-            showToast('محصول به سبد خرید اضافه شد.', 'success');
-            closeProductModal();
+            saveToStorage();
             updateCartBadge();
-            toggleCartDrawer(true);
+            closeProductModal();
+            showToast('محصول با موفقیت به سبد خرید اضافه شد.', 'success');
+            toggleCartDrawer();
         }
 
-        function toggleCartDrawer(open) {
-            const drawer = document.getElementById('cart-drawer');
-            const content = document.getElementById('cart-drawer-content');
+        function updateCartBadge() {
+            const count = state.cart.reduce((sum, item) => sum + item.qty, 0);
+            document.getElementById('cart-count').innerText = count;
+            renderCartItems();
+        }
 
-            if (open) {
-                renderCartItems();
-                drawer.classList.remove('opacity-0', 'pointer-events-none');
-                content.classList.remove('-translate-x-full');
-            } else {
-                drawer.classList.add('opacity-0', 'pointer-events-none');
-                content.classList.add('-translate-x-full');
-            }
+        function toggleCartDrawer() {
+            const drawer = document.getElementById('cart-drawer');
+            drawer.classList.toggle('hidden');
         }
 
         function renderCartItems() {
             const container = document.getElementById('cart-items-container');
-            const totalEl = document.getElementById('cart-total-price');
+            const totalElement = document.getElementById('cart-total-price');
 
-            if (appState.cart.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-12 text-slate-400 text-xs">
-                        <i class="fa-solid fa-bag-shopping text-3xl mb-2 block"></i>
-                        سبد خرید شما خالی است.
-                    </div>
-                `;
-                totalEl.innerText = "۰ تومان";
-                document.getElementById('checkout-start-btn').disabled = true;
+            if (state.cart.length === 0) {
+                container.innerHTML = `<div class="text-center py-10 text-stone-400 text-xs">سبد خرید شما خالی است.</div>`;
+                totalElement.innerText = '۰ تومان';
                 return;
             }
 
-            document.getElementById('checkout-start-btn').disabled = false;
-
-            let grandTotal = 0;
-            container.innerHTML = appState.cart.map((item, idx) => {
-                const itemTotal = item.price * item.quantity;
-                grandTotal += itemTotal;
-
+            let total = 0;
+            container.innerHTML = state.cart.map((item, idx) => {
+                total += item.price * item.qty;
                 return `
-                    <div class="flex items-center gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-200/80">
-                        <img src="${item.image}" alt="${item.name}" class="w-14 h-18 object-cover rounded-xl bg-slate-200">
-                        <div class="flex-grow text-xs">
-                            <h5 class="font-bold text-obsidian line-clamp-1">${item.name}</h5>
-                            <p class="text-slate-500 mt-0.5">رنگ: ${item.color} | سایز: ${item.size}</p>
-                            <p class="font-black text-obsidian mt-1">${formatPrice(item.price)} تومان</p>
+                    <div class="flex items-center gap-3 p-3 bg-white rounded-xl border border-stone-200">
+                        <img src="${item.image}" class="w-16 h-16 object-cover rounded-lg">
+                        <div class="flex-grow">
+                            <h5 class="font-bold text-xs text-brand-primary line-clamp-1">${item.title}</h5>
+                            <p class="text-[10px] text-stone-500">رنگ: ${item.color} | سایز: ${item.size}</p>
+                            <div class="font-black text-xs text-stone-900 mt-1">${formatPrice(item.price)}</div>
                         </div>
-                        <div class="flex flex-col items-end gap-2">
-                            <button onclick="removeFromCart(${idx})" class="text-slate-400 hover:text-red-500 text-xs"><i class="fa-solid fa-trash"></i></button>
-                            <div class="flex items-center border rounded-lg bg-white text-xs">
-                                <button onclick="changeCartQty(${idx}, -1)" class="px-2 py-0.5 hover:bg-slate-100">-</button>
-                                <span class="px-2 font-bold">${item.quantity}</span>
-                                <button onclick="changeCartQty(${idx}, 1)" class="px-2 py-0.5 hover:bg-slate-100">+</button>
-                            </div>
+                        <div class="flex flex-col items-center gap-1">
+                            <button onclick="changeCartQty(${idx}, 1)" class="text-xs w-6 h-6 bg-stone-100 hover:bg-stone-200 rounded font-bold">+</button>
+                            <span class="text-xs font-bold">${item.qty}</span>
+                            <button onclick="changeCartQty(${idx}, -1)" class="text-xs w-6 h-6 bg-stone-100 hover:bg-stone-200 rounded font-bold">-</button>
                         </div>
                     </div>
                 `;
             }).join('');
 
-            totalEl.innerText = `${formatPrice(grandTotal)} تومان`;
+            totalElement.innerText = formatPrice(total);
         }
 
         function changeCartQty(index, delta) {
-            const item = appState.cart[index];
-            const product = appState.products.find(p => p.id === item.productId);
-            const variantKey = `${item.color}_${item.size}`;
-            const maxStock = (product && product.variants) ? product.variants[variantKey] : 99;
-
-            if (delta > 0 && item.quantity + 1 > maxStock) {
-                showToast('موجودی انبار کافی نیست.', 'error');
-                return;
+            state.cart[index].qty += delta;
+            if (state.cart[index].qty <= 0) {
+                state.cart.splice(index, 1);
             }
-
-            item.quantity += delta;
-            if (item.quantity <= 0) {
-                appState.cart.splice(index, 1);
-            }
-            updateCartBadge();
-            renderCartItems();
-        }
-
-        function removeFromCart(index) {
-            appState.cart.splice(index, 1);
-            updateCartBadge();
-            renderCartItems();
-        }
-
-        function updateCartBadge() {
-            const count = appState.cart.reduce((a, b) => a + b.quantity, 0);
-            document.getElementById('cart-count-badge').innerText = count;
-        }
-
-        function openCheckoutModal() {
-            if (appState.cart.length === 0) return;
-            toggleCartDrawer(false);
-
-            document.getElementById('checkout-step-1').classList.remove('hidden');
-            document.getElementById('checkout-step-2').classList.add('hidden');
-            document.getElementById('checkout-step-3').classList.add('hidden');
-
-            const modal = document.getElementById('checkout-modal');
-            modal.classList.remove('opacity-0', 'pointer-events-none');
-        }
-
-        function closeCheckoutModal() {
-            document.getElementById('checkout-modal').classList.add('opacity-0', 'pointer-events-none');
-        }
-
-        function goToPaymentGateway() {
-            const name = document.getElementById('ship-name').value.trim();
-            const phone = document.getElementById('ship-phone').value.trim();
-            const address = document.getElementById('ship-address').value.trim();
-            const postal = document.getElementById('ship-postal').value.trim();
-
-            if (!name || !phone || !address || !postal) {
-                showToast('لطفاً تمام فیلدهای آدرس و گیرنده را تکمیل کنید.', 'error');
-                return;
-            }
-
-            const grandTotal = appState.cart.reduce((a, b) => a + (b.price * b.quantity), 0);
-            document.getElementById('gateway-total-amount').innerText = `${formatPrice(grandTotal)} تومان`;
-
-            document.getElementById('checkout-step-1').classList.add('hidden');
-            document.getElementById('checkout-step-2').classList.remove('hidden');
-
-            document.getElementById('step-ind-1').className = "text-slate-400";
-            document.getElementById('step-ind-2').className = "text-obsidian border-b-2 border-obsidian pb-1 font-bold";
-        }
-
-        function triggerOtpTimer() {
-            let timer = 120;
-            const btn = document.getElementById('otp-btn');
-            btn.disabled = true;
-
-            const interval = setInterval(() => {
-                timer--;
-                btn.innerText = `کد ارسال شد (${timer}s)`;
-                if (timer <= 0) {
-                    clearInterval(interval);
-                    btn.disabled = false;
-                    btn.innerText = "درخواست رمز پویا";
-                }
-            }, 1000);
-
-            showToast('رمز پویا به‌صورت شبیه‌سازی شده ارسال گردید.', 'success');
-        }
-
-        function processFinalPayment() {
-            // Deduct stock from variants automatically
-            appState.cart.forEach(cartItem => {
-                const product = appState.products.find(p => p.id === cartItem.productId);
-                if (product && product.variants) {
-                    const variantKey = `${cartItem.color}_${cartItem.size}`;
-                    if (product.variants[variantKey] !== undefined) {
-                        product.variants[variantKey] = Math.max(0, product.variants[variantKey] - cartItem.quantity);
-                    }
-                }
-            });
-
-            // Create Order Record
-            const orderId = 'NEOS-' + Math.floor(100000 + Math.random() * 900000);
-            const grandTotal = appState.cart.reduce((a, b) => a + (b.price * b.quantity), 0);
-
-            const newOrder = {
-                id: orderId,
-                date: new Date().toLocaleDateString('fa-IR'),
-                timestamp: Date.now(),
-                customerName: document.getElementById('ship-name').value,
-                customerPhone: document.getElementById('ship-phone').value,
-                shippingAddress: {
-                    province: document.getElementById('ship-province').value,
-                    city: document.getElementById('ship-city').value,
-                    address: document.getElementById('ship-address').value,
-                    postalCode: document.getElementById('ship-postal').value,
-                    method: document.getElementById('ship-method').value
-                },
-                items: [...appState.cart],
-                totalAmount: grandTotal,
-                status: "در حال بررسی",
-                trackingCode: ""
-            };
-
-            appState.orders.unshift(newOrder);
-            appState.currentCustomerPhone = newOrder.customerPhone;
-            appState.cart = [];
-            
             saveToStorage();
             updateCartBadge();
-            renderProducts();
-
-            // Show Receipt Step
-            document.getElementById('checkout-step-2').classList.add('hidden');
-            document.getElementById('checkout-step-3').classList.remove('hidden');
-            document.getElementById('receipt-order-id').innerText = orderId;
-
-            document.getElementById('step-ind-2').className = "text-slate-400";
-            document.getElementById('step-ind-3').className = "text-emerald-600 font-bold border-b-2 border-emerald-600 pb-1";
         }
 
-        function openCustomerAuthModal() {
-            const modal = document.getElementById('customer-modal');
-            const authForm = document.getElementById('customer-auth-form');
-            const dashView = document.getElementById('customer-dashboard-view');
-
-            if (appState.currentCustomerPhone) {
-                authForm.classList.add('hidden');
-                dashView.classList.remove('hidden');
-                renderCustomerOrders();
+        /* ==========================================================================
+           CUSTOMER ACCOUNT & AUTHENTICATION
+           ========================================================================== */
+        
+        function handleAccountClick() {
+            if (state.currentUser) {
+                openAccountDashboard();
             } else {
-                authForm.classList.remove('hidden');
-                dashView.classList.add('hidden');
+                openAuthModal('login');
             }
-
-            modal.classList.remove('opacity-0', 'pointer-events-none');
         }
 
-        function closeCustomerModal() {
-            document.getElementById('customer-modal').classList.add('opacity-0', 'pointer-events-none');
+        function updateUserBadge() {
+            const badge = document.getElementById('user-badge');
+            if (state.currentUser) {
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
         }
 
-        function handleCustomerLogin() {
-            const phone = document.getElementById('cust-login-phone').value.trim();
-            if (!phone) {
-                showToast('لطفاً شماره موبایل خود را وارد کنید.', 'error');
+        function openAuthModal(tab = 'login') {
+            switchAuthTab(tab);
+            document.getElementById('auth-modal').classList.remove('hidden');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('auth-modal').classList.add('hidden');
+        }
+
+        function switchAuthTab(tab) {
+            const loginForm = document.getElementById('login-form');
+            const regForm = document.getElementById('register-form');
+            const loginBtn = document.getElementById('tab-login-btn');
+            const regBtn = document.getElementById('tab-register-btn');
+
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden');
+                regForm.classList.add('hidden');
+                loginBtn.className = "w-1/2 pb-3 font-bold text-center border-b-2 border-brand-gold text-brand-primary";
+                regBtn.className = "w-1/2 pb-3 font-semibold text-center border-b-2 border-transparent text-stone-400 hover:text-stone-700";
+            } else {
+                regForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+                regBtn.className = "w-1/2 pb-3 font-bold text-center border-b-2 border-brand-gold text-brand-primary";
+                loginBtn.className = "w-1/2 pb-3 font-semibold text-center border-b-2 border-transparent text-stone-400 hover:text-stone-700";
+            }
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value.trim();
+            const phone = document.getElementById('reg-phone').value.trim();
+            const password = document.getElementById('reg-password').value.trim();
+
+            if (state.users.some(u => u.phone === phone)) {
+                showToast('این شماره موبایل قبلاً در سیستم ثبت شده است.', 'error');
                 return;
             }
-            appState.currentCustomerPhone = phone;
-            openCustomerAuthModal();
-            showToast('با موفقیت وارد حساب کاربری شدید.', 'success');
+
+            const newUser = { id: 'u_' + Date.now(), name, phone, password };
+            state.users.push(newUser);
+            state.currentUser = newUser;
+            saveToStorage();
+            
+            updateUserBadge();
+            closeAuthModal();
+            showToast(`خوش آمدید ${name}! حساب کاربری شما ایجاد شد.`, 'success');
         }
 
-        function logoutCustomer() {
-            appState.currentCustomerPhone = null;
-            openCustomerAuthModal();
+        function handleLogin(e) {
+            e.preventDefault();
+            const phone = document.getElementById('login-phone').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+
+            // Strict check for BOTH phone and password
+            const user = state.users.find(u => u.phone === phone && u.password === password);
+
+            if (!user) {
+                showToast('شماره موبایل یا رمز عبور اشتباه است.', 'error');
+                return;
+            }
+
+            state.currentUser = user;
+            saveToStorage();
+
+            updateUserBadge();
+            closeAuthModal();
+            showToast(`ورود موفقیت‌آمیز بود. خوش آمدید ${user.name}`, 'success');
+        }
+
+        function handleLogout() {
+            state.currentUser = null;
+            saveToStorage();
+            updateUserBadge();
+            closeAccountDashboard();
+            showToast('از حساب کاربری خارج شدید.', 'info');
+        }
+
+        function openAccountDashboard() {
+            if (!state.currentUser) return;
+
+            document.getElementById('user-display-name').innerText = state.currentUser.name;
+            document.getElementById('user-display-phone').innerText = state.currentUser.phone;
+            document.getElementById('user-avatar-text').innerText = state.currentUser.name.substring(0, 2);
+
+            renderCustomerOrders();
+            document.getElementById('account-dashboard-modal').classList.remove('hidden');
+        }
+
+        function closeAccountDashboard() {
+            document.getElementById('account-dashboard-modal').classList.add('hidden');
         }
 
         function renderCustomerOrders() {
-            document.getElementById('cust-phone-display').innerText = `تلفن: ${appState.currentCustomerPhone}`;
             const container = document.getElementById('customer-orders-list');
+            const myOrders = state.orders.filter(o => o.userId === state.currentUser.id);
 
-            const customerOrders = appState.orders.filter(o => o.customerPhone === appState.currentCustomerPhone);
-
-            if (customerOrders.length === 0) {
-                container.innerHTML = '<p class="text-xs text-slate-400 text-center py-6">هنوز هیچ سفارشی ثبت نکرده‌اید.</p>';
+            if (myOrders.length === 0) {
+                container.innerHTML = `<div class="p-8 text-center text-xs text-stone-400 bg-white rounded-xl border border-stone-200">هنوز هیچ سفارشی ثبت نکرده‌اید.</div>`;
                 return;
             }
 
-            container.innerHTML = customerOrders.map(o => `
-                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs space-y-2">
-                    <div class="flex justify-between items-center font-bold">
-                        <span>کد سفارش: ${o.id}</span>
-                        <span class="px-2.5 py-1 rounded-full text-[10px] ${getStatusBadgeStyle(o.status)}">${o.status}</span>
-                    </div>
-                    <p class="text-slate-500">تاریخ ثبت: ${o.date} | مبلغ: ${formatPrice(o.totalAmount)} تومان</p>
-                    ${o.trackingCode ? `
-                        <div class="bg-emerald-50 text-emerald-800 p-2 rounded-xl border border-emerald-200 text-[11px] font-mono">
-                            کد رهگیری پستی: <span class="font-bold">${o.trackingCode}</span>
+            container.innerHTML = myOrders.map(order => `
+                <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm space-y-3">
+                    <div class="flex flex-wrap justify-between items-center border-b pb-3 gap-2 text-xs">
+                        <div>
+                            <span class="font-bold text-stone-900">سفارش #${order.id}</span>
+                            <span class="text-stone-400 mr-2">${order.date}</span>
                         </div>
-                    ` : ''}
+                        <span class="px-3 py-1 rounded-full text-xs font-bold ${getStatusBadgeClass(order.status)}">
+                            ${order.status}
+                        </span>
+                    </div>
+
+                    <!-- Items List -->
+                    <div class="space-y-2">
+                        ${order.items.map(item => `
+                            <div class="flex items-center gap-3 text-xs">
+                                <img src="${item.image}" class="w-10 h-10 object-cover rounded-lg">
+                                <div class="flex-grow">
+                                    <span class="font-semibold text-stone-800">${item.title}</span>
+                                    <span class="text-stone-400 block text-[10px]">رنگ: ${item.color} | سایز: ${item.size} (${item.qty} عدد)</span>
+                                </div>
+                                <span class="font-bold text-stone-900">${formatPrice(item.price * item.qty)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <!-- Order Footer with Tracking Code -->
+                    <div class="border-t pt-3 flex flex-wrap justify-between items-center text-xs gap-2">
+                        <div>
+                            <span class="text-stone-500">مبلغ کل: </span>
+                            <span class="font-black text-brand-primary">${formatPrice(order.totalPrice)}</span>
+                        </div>
+                        ${order.trackingCode ? `
+                            <div class="bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200 text-amber-900 font-mono flex items-center gap-2">
+                                <span>کد رهگیری: <b>${order.trackingCode}</b></span>
+                                <button onclick="navigator.clipboard.writeText('${order.trackingCode}'); showToast('کد رهگیری کپی شد', 'success');" class="text-amber-700 hover:text-black"><i class="fa-regular fa-copy"></i></button>
+                            </div>
+                        ` : `<span class="text-stone-400 text-[10px]">کد رهگیری پستی پس از تحویل ارائه می‌شود</span>`}
+                    </div>
                 </div>
             `).join('');
         }
 
-        function getStatusBadgeStyle(status) {
-            if (status === 'در حال بررسی') return 'bg-amber-100 text-amber-800';
-            if (status === 'در حال آماده‌سازی') return 'bg-blue-100 text-blue-800';
-            if (status === 'تحویل به پست') return 'bg-purple-100 text-purple-800';
-            if (status === 'تکمیل شده') return 'bg-emerald-100 text-emerald-800';
-            return 'bg-slate-200 text-slate-700';
-        }
-
-
-        /* ========================================== */
-        /* HIDDEN ADMIN PANEL LOGIC (#admin GATEWAY)  */
-        /* ========================================== */
-
-        function toggleAdminAuthMode() {
-            appState.adminModeIsRegister = !appState.adminModeIsRegister;
-            const extra = document.getElementById('admin-reg-extra');
-            const submitBtn = document.getElementById('admin-auth-submit-btn');
-            const toggleBtn = document.getElementById('admin-auth-toggle-btn');
-
-            if (appState.adminModeIsRegister) {
-                extra.classList.remove('hidden');
-                submitBtn.innerText = "ارسال درخواست ثبت‌نام ادمین";
-                toggleBtn.innerText = "قبلاً ادمین شده‌اید؟ ورود";
-            } else {
-                extra.classList.add('hidden');
-                submitBtn.innerText = "ورود به پنل مدیریت";
-                toggleBtn.innerText = "ثبت‌نام ادمین جدید (درخواست دسترسی)";
+        function getStatusBadgeClass(status) {
+            switch (status) {
+                case 'در حال بررسی': return 'bg-amber-100 text-amber-800';
+                case 'آماده‌سازی': return 'bg-blue-100 text-blue-800';
+                case 'ارسال شده': return 'bg-purple-100 text-purple-800';
+                case 'تکمیل شده': return 'bg-emerald-100 text-emerald-800';
+                default: return 'bg-stone-100 text-stone-800';
             }
         }
 
-        function submitAdminAuth() {
-            const username = document.getElementById('adm-username-input').value.trim();
-            const password = document.getElementById('adm-password-input').value.trim();
-
-            if (!username || !password) {
-                showToast('لطفاً نام کاربری و رمز عبور ادمین را وارد کنید.', 'error');
+        /* ==========================================================================
+           CHECKOUT & GATEWAY
+           ========================================================================== */
+        
+        function proceedToCheckout() {
+            if (state.cart.length === 0) {
+                showToast('سبد خرید شما خالی است.', 'error');
                 return;
             }
 
-            if (appState.adminModeIsRegister) {
-                // Registering Admin
-                const fullname = document.getElementById('adm-fullname-input').value.trim() || username;
-                const isFirst = appState.admins.length === 0;
-
-                const newAdmin = {
-                    id: 'adm_' + Date.now(),
-                    username,
-                    password,
-                    fullname,
-                    role: isFirst ? 'super' : 'admin',
-                    status: isFirst ? 'approved' : 'pending'
-                };
-
-                appState.admins.push(newAdmin);
-                saveToStorage();
-
-                if (isFirst) {
-                    showToast('شما به عنوان سوپر ادمین اصلی ثبت و تایید شدید.', 'success');
-                    appState.currentAdmin = newAdmin;
-                    initRouter();
-                } else {
-                    showToast('درخواست ثبت‌نام ارسال شد. منتظر تایید سوپر ادمین باشید.', 'info');
-                    toggleAdminAuthMode();
-                }
-
-            } else {
-                // Logging in Admin
-                const found = appState.admins.find(a => a.username === username && a.password === password);
-                if (!found) {
-                    showToast('نام کاربری یا رمز عبور ادمین اشتباه است.', 'error');
-                    return;
-                }
-
-                if (found.status !== 'approved') {
-                    showToast('حساب ادمین شما هنوز توسط سوپر ادمین تایید نشده است.', 'error');
-                    return;
-                }
-
-                appState.currentAdmin = found;
-                showToast(`خوش آمدید ادمین ${found.fullname}`, 'success');
-                initRouter();
+            if (!state.currentUser) {
+                toggleCartDrawer();
+                showToast('برای تکمیل خرید، ابتدا وارد حساب کاربری خود شوید.', 'info');
+                openAuthModal('login');
+                return;
             }
+
+            toggleCartDrawer();
+            
+            // Auto fill inputs if logged in
+            document.getElementById('chk-name').value = state.currentUser.name || '';
+            document.getElementById('chk-phone').value = state.currentUser.phone || '';
+
+            document.getElementById('checkout-modal').classList.remove('hidden');
         }
 
-        function logoutAdmin() {
-            appState.currentAdmin = null;
-            window.location.hash = '';
-            initRouter();
+        function closeCheckoutModal() {
+            document.getElementById('checkout-modal').classList.add('hidden');
         }
 
-        function switchAdminTab(tabName) {
-            ['dashboard', 'products', 'orders', 'categories', 'approvals', 'settings'].forEach(t => {
-                document.getElementById(`adm-tab-${t}`).classList.add('hidden');
-                document.getElementById(`adm-nav-${t}`).classList.remove('bg-slate-800', 'text-warmgold');
+        function startGatewayPayment(e) {
+            e.preventDefault();
+            
+            state.pendingOrderDetails = {
+                name: document.getElementById('chk-name').value,
+                phone: document.getElementById('chk-phone').value,
+                postalCode: document.getElementById('chk-postal').value,
+                address: document.getElementById('chk-address').value,
+                total: state.cart.reduce((sum, item) => sum + (item.price * item.qty), 0)
+            };
+
+            closeCheckoutModal();
+            
+            document.getElementById('gateway-amount').innerText = formatPrice(state.pendingOrderDetails.total);
+            document.getElementById('gateway-modal').classList.remove('hidden');
+        }
+
+        function cancelPayment() {
+            document.getElementById('gateway-modal').classList.add('hidden');
+            showToast('پرداخت لغو شد.', 'info');
+        }
+
+        function completePayment(e) {
+            e.preventDefault();
+
+            // Create Order
+            const newOrder = {
+                id: 'N' + Math.floor(100000 + Math.random() * 900000),
+                userId: state.currentUser.id,
+                userName: state.pendingOrderDetails.name,
+                userPhone: state.pendingOrderDetails.phone,
+                address: state.pendingOrderDetails.address,
+                postalCode: state.pendingOrderDetails.postalCode,
+                items: [...state.cart],
+                totalPrice: state.pendingOrderDetails.total,
+                status: 'در حال بررسی',
+                trackingCode: '',
+                date: new Date().toLocaleDateString('fa-IR')
+            };
+
+            // Reduce product stock
+            state.cart.forEach(cartItem => {
+                const product = state.products.find(p => p.id === cartItem.id);
+                if (product) {
+                    product.stock = Math.max(0, product.stock - cartItem.qty);
+                }
             });
 
-            document.getElementById(`adm-tab-${tabName}`).classList.remove('hidden');
-            document.getElementById(`adm-nav-${tabName}`).classList.add('bg-slate-800', 'text-warmgold');
+            state.orders.unshift(newOrder);
+            state.cart = [];
+            saveToStorage();
 
-            if (tabName === 'dashboard') renderAdminDashboard();
-            if (tabName === 'products') renderAdminProductsTable();
-            if (tabName === 'orders') renderAdminOrdersTable();
-            if (tabName === 'categories') renderAdminCategories();
-            if (tabName === 'approvals') renderAdminApprovals();
-            if (tabName === 'settings') renderAdminSettings();
+            document.getElementById('gateway-modal').classList.add('hidden');
+            renderApp();
+            showToast('پرداخت با موفقیت انجام شد! سفارش شما ثبت گردید.', 'success');
+            openAccountDashboard();
         }
 
-        function renderAdminDashboard() {
-            document.getElementById('current-admin-display').innerText = `ورود: ${appState.currentAdmin.fullname} (${appState.currentAdmin.role === 'super' ? 'سوپر ادمین' : 'ادمین'})`;
+        /* ==========================================================================
+           ADMIN PANEL LOGIC
+           ========================================================================== */
+        
+        function openAdminPanel() {
+            document.getElementById('admin-panel-modal').classList.remove('hidden');
+            switchAdminTab('products');
+            renderAdminData();
+        }
 
-            const totalRevenue = appState.orders.reduce((a, b) => a + b.totalAmount, 0);
-            document.getElementById('adm-stat-revenue').innerText = `${formatPrice(totalRevenue)} تومان`;
-            document.getElementById('adm-stat-orders-count').innerText = appState.orders.length;
-            document.getElementById('adm-stat-products-count').innerText = appState.products.length;
-
-            const pendingAdminsCount = appState.admins.filter(a => a.status === 'pending').length;
-            document.getElementById('adm-stat-pending-admins').innerText = pendingAdminsCount;
-
-            if (pendingAdminsCount > 0) {
-                document.getElementById('admin-pending-users-badge').innerText = pendingAdminsCount;
-                document.getElementById('admin-pending-users-badge').classList.remove('hidden');
-            } else {
-                document.getElementById('admin-pending-users-badge').classList.add('hidden');
+        function closeAdminPanel() {
+            document.getElementById('admin-panel-modal').classList.add('hidden');
+            if (window.location.hash === '#admin') {
+                window.location.hash = '';
             }
         }
 
-        function renderAdminProductsTable() {
-            const tbody = document.getElementById('admin-products-table-body');
-            tbody.innerHTML = appState.products.map(p => {
-                const totalStock = Object.values(p.variants || {}).reduce((a, b) => a + b, 0);
-                return `
-                    <tr class="hover:bg-slate-800/40">
-                        <td class="p-4"><img src="${p.image}" class="w-10 h-12 object-cover rounded-lg bg-slate-700"></td>
-                        <td class="p-4 font-bold text-white">${p.name}</td>
-                        <td class="p-4 text-slate-400">${p.category}</td>
-                        <td class="p-4 text-emerald-400 font-mono">${formatPrice(p.price)}</td>
-                        <td class="p-4">${totalStock} عدد</td>
-                        <td class="p-4 flex gap-2">
-                            <button onclick="deleteProduct('${p.id}')" class="text-red-400 hover:text-red-300 p-1.5"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
+        function switchAdminTab(tab) {
+            state.activeAdminTab = tab;
+            const prodBtn = document.getElementById('admin-tab-products');
+            const orderBtn = document.getElementById('admin-tab-orders');
+            const prodView = document.getElementById('admin-view-products');
+            const orderView = document.getElementById('admin-view-orders');
+
+            if (tab === 'products') {
+                prodView.classList.remove('hidden');
+                orderView.classList.add('hidden');
+                prodBtn.className = "px-4 py-2 rounded-xl bg-brand-primary text-white transition";
+                orderBtn.className = "px-4 py-2 rounded-xl text-stone-600 hover:bg-stone-200 transition";
+            } else {
+                orderView.classList.remove('hidden');
+                prodView.classList.add('hidden');
+                orderBtn.className = "px-4 py-2 rounded-xl bg-brand-primary text-white transition";
+                prodBtn.className = "px-4 py-2 rounded-xl text-stone-600 hover:bg-stone-200 transition";
+            }
         }
 
-        function deleteProduct(productId) {
-            if (!confirm('آیا از حذف این محصول اطمینان دارید؟')) return;
-            appState.products = appState.products.filter(p => p.id !== productId);
-            saveToStorage();
-            renderAdminProductsTable();
-            renderPublicUI();
-            showToast('محصول حذف شد.', 'info');
-        }
+        function renderAdminData() {
+            document.getElementById('admin-product-count').innerText = state.products.length;
+            document.getElementById('admin-order-count').innerText = state.orders.length;
 
-        function renderAdminOrdersTable() {
-            const tbody = document.getElementById('admin-orders-table-body');
-            tbody.innerHTML = appState.orders.map(o => `
-                <tr class="hover:bg-slate-800/40">
-                    <td class="p-4 font-bold text-white font-mono">${o.id}</td>
-                    <td class="p-4">${o.customerName}</td>
-                    <td class="p-4 font-mono text-slate-400">${o.customerPhone}</td>
-                    <td class="p-4 text-emerald-400 font-bold">${formatPrice(o.totalAmount)}</td>
-                    <td class="p-4">
-                        <select onchange="updateOrderStatus('${o.id}', this.value)" class="bg-slate-900 border border-slate-700 text-xs rounded-lg p-1.5 text-white">
-                            <option value="در حال بررسی" ${o.status === 'در حال بررسی' ? 'selected' : ''}>در حال بررسی</option>
-                            <option value="در حال آماده‌سازی" ${o.status === 'در حال آماده‌سازی' ? 'selected' : ''}>در حال آماده‌سازی</option>
-                            <option value="تحویل به پست" ${o.status === 'تحویل به پست' ? 'selected' : ''}>تحویل به پست</option>
-                            <option value="تکمیل شده" ${o.status === 'تکمیل شده' ? 'selected' : ''}>تکمیل شده</option>
-                        </select>
-                    </td>
-                    <td class="p-4">
-                        <input type="text" value="${o.trackingCode || ''}" onchange="updateOrderTracking('${o.id}', this.value)" placeholder="کد پستی..." class="bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-white w-28">
-                    </td>
-                    <td class="p-4">
-                        <button onclick="alert('آدرس: ${o.shippingAddress.province}، ${o.shippingAddress.city}، ${o.shippingAddress.address}')" class="text-warmgold hover:underline text-xs">آدرس</button>
+            // Render Products Table
+            const prodTable = document.getElementById('admin-products-table');
+            prodTable.innerHTML = state.products.map(p => `
+                <tr class="hover:bg-stone-50">
+                    <td class="p-3"><img src="${p.image}" class="w-10 h-10 object-cover rounded-lg"></td>
+                    <td class="p-3 font-bold text-stone-900">${p.title}</td>
+                    <td class="p-3 text-stone-500">${p.category}</td>
+                    <td class="p-3 font-black">${formatPrice(p.price)}</td>
+                    <td class="p-3 font-bold ${p.stock < 5 ? 'text-rose-600' : 'text-emerald-700'}">${p.stock} عدد</td>
+                    <td class="p-3">
+                        <div class="flex gap-2">
+                            <button onclick="editProductFromAdmin('${p.id}')" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-3 py-1 rounded-lg text-xs font-bold transition">
+                                <i class="fa-solid fa-pen-to-square"></i> ویرایش
+                            </button>
+                            <button onclick="deleteProductFromAdmin('${p.id}')" class="bg-rose-100 hover:bg-rose-200 text-rose-800 px-2 py-1 rounded-lg text-xs transition">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
                     </td>
                 </tr>
             `).join('');
+
+            // Render Orders Admin List
+            const ordersContainer = document.getElementById('admin-orders-container');
+            if (state.orders.length === 0) {
+                ordersContainer.innerHTML = `<div class="p-8 text-center text-xs text-stone-400">سفارشی وجود ندارد.</div>`;
+                return;
+            }
+
+            ordersContainer.innerHTML = state.orders.map(order => `
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm space-y-4">
+                    <div class="flex flex-wrap justify-between items-center text-xs border-b pb-3">
+                        <div>
+                            <span class="font-bold text-stone-900">سفارش #${order.id}</span>
+                            <span class="text-stone-400 mr-2">${order.date}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-stone-500">خریدار: <b>${order.userName} (${order.userPhone})</b></span>
+                        </div>
+                    </div>
+
+                    <div class="text-xs text-stone-600 space-y-1">
+                        <p>📍 <b>آدرس تحویل:</b> ${order.address} (کدپستی: ${order.postalCode})</p>
+                        <p>📦 <b>اقلام:</b> ${order.items.map(i => `${i.title} (${i.color}/${i.size}) x${i.qty}`).join(' ، ')}</p>
+                        <p class="font-black text-stone-900">مبلغ: ${formatPrice(order.totalPrice)}</p>
+                    </div>
+
+                    <!-- Status & Tracking Controls -->
+                    <div class="bg-stone-50 p-3 rounded-xl flex flex-wrap justify-between items-center gap-3 border text-xs">
+                        <div class="flex items-center gap-2">
+                            <label class="font-bold">تغییر وضعیت:</label>
+                            <select onchange="updateOrderStatus('${order.id}', this.value)" class="px-3 py-1.5 rounded-lg border border-stone-300 font-bold bg-white text-xs">
+                                <option value="در حال بررسی" ${order.status === 'در حال بررسی' ? 'selected' : ''}>در حال بررسی</option>
+                                <option value="آماده‌سازی" ${order.status === 'آماده‌سازی' ? 'selected' : ''}>آماده‌سازی</option>
+                                <option value="ارسال شده" ${order.status === 'ارسال شده' ? 'selected' : ''}>ارسال شده (پست/تیپاکس)</option>
+                                <option value="تکمیل شده" ${order.status === 'تکمیل شده' ? 'selected' : ''}>تکمیل شده</option>
+                            </select>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <input type="text" id="track-input-${order.id}" value="${order.trackingCode || ''}" placeholder="ثبت کد رهگیری..." class="px-3 py-1.5 rounded-lg border border-stone-300 font-mono text-xs">
+                            <button onclick="saveTrackingCode('${order.id}')" class="bg-brand-primary text-white px-3 py-1.5 rounded-lg font-bold">ثبت کد</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        function updateOrderStatus(orderId, status) {
-            const order = appState.orders.find(o => o.id === orderId);
+        /* ADMIN PRODUCT EDIT / ADD */
+        function openProductEditorModal() {
+            document.getElementById('editor-modal-title').innerText = 'افزودن محصول جدید';
+            document.getElementById('edit-prod-id').value = '';
+            document.getElementById('edit-prod-title').value = '';
+            document.getElementById('edit-prod-cat').value = 'هودی و دورس';
+            document.getElementById('edit-prod-price').value = '';
+            document.getElementById('edit-prod-stock').value = '';
+            document.getElementById('edit-prod-img').value = '';
+            document.getElementById('edit-prod-colors').value = '';
+            document.getElementById('edit-prod-sizes').value = '';
+            document.getElementById('edit-prod-desc').value = '';
+
+            document.getElementById('product-editor-modal').classList.remove('hidden');
+        }
+
+        function editProductFromAdmin(id) {
+            const p = state.products.find(item => item.id === id);
+            if (!p) return;
+
+            document.getElementById('editor-modal-title').innerText = 'ویرایش محصول';
+            document.getElementById('edit-prod-id').value = p.id;
+            document.getElementById('edit-prod-title').value = p.title;
+            document.getElementById('edit-prod-cat').value = p.category;
+            document.getElementById('edit-prod-price').value = p.price;
+            document.getElementById('edit-prod-stock').value = p.stock;
+            document.getElementById('edit-prod-img').value = p.image;
+            document.getElementById('edit-prod-colors').value = p.colors.join(', ');
+            document.getElementById('edit-prod-sizes').value = p.sizes.join(', ');
+            document.getElementById('edit-prod-desc').value = p.description;
+
+            document.getElementById('product-editor-modal').classList.remove('hidden');
+        }
+
+        function closeProductEditorModal() {
+            document.getElementById('product-editor-modal').classList.add('hidden');
+        }
+
+        function saveProductFromAdmin(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-prod-id').value;
+            const title = document.getElementById('edit-prod-title').value.trim();
+            const category = document.getElementById('edit-prod-cat').value;
+            const price = parseInt(document.getElementById('edit-prod-price').value);
+            const stock = parseInt(document.getElementById('edit-prod-stock').value);
+            const image = document.getElementById('edit-prod-img').value.trim();
+            const colors = document.getElementById('edit-prod-colors').value.split(',').map(s => s.trim()).filter(Boolean);
+            const sizes = document.getElementById('edit-prod-sizes').value.split(',').map(s => s.trim()).filter(Boolean);
+            const description = document.getElementById('edit-prod-desc').value.trim();
+
+            if (id) {
+                // Edit Existing
+                const index = state.products.findIndex(p => p.id === id);
+                if (index > -1) {
+                    state.products[index] = { id, title, category, price, stock, image, colors, sizes, description };
+                    showToast('تغییرات محصول با موفقیت ذخیره شد.', 'success');
+                }
+            } else {
+                // Add New
+                const newProd = {
+                    id: 'p_' + Date.now(),
+                    title, category, price, stock, image, colors, sizes, description
+                };
+                state.products.unshift(newProd);
+                showToast('محصول جدید با موفقیت اضافه شد.', 'success');
+            }
+
+            saveToStorage();
+            closeProductEditorModal();
+            renderAdminData();
+            renderApp();
+        }
+
+        function deleteProductFromAdmin(id) {
+            state.products = state.products.filter(p => p.id !== id);
+            saveToStorage();
+            renderAdminData();
+            renderApp();
+            showToast('محصول حذف گردید.', 'info');
+        }
+
+        function updateOrderStatus(orderId, newStatus) {
+            const order = state.orders.find(o => o.id === orderId);
             if (order) {
-                order.status = status;
+                order.status = newStatus;
                 saveToStorage();
-                showToast('وضعیت سفارش بروزرسانی شد.', 'success');
+                renderAdminData();
+                showToast(`وضعیت سفارش به "${newStatus}" تغییر یافت.`, 'success');
             }
         }
 
-        function updateOrderTracking(orderId, code) {
-            const order = appState.orders.find(o => o.id === orderId);
+        function saveTrackingCode(orderId) {
+            const code = document.getElementById(`track-input-${orderId}`).value.trim();
+            const order = state.orders.find(o => o.id === orderId);
             if (order) {
                 order.trackingCode = code;
                 saveToStorage();
-                showToast('کد رهگیری پستی ذخیره شد.', 'success');
+                renderAdminData();
+                showToast('کد رهگیری پستی ثبت گردید.', 'success');
             }
         }
 
-        function renderAdminCategories() {
-            const list = document.getElementById('admin-categories-list');
-            list.innerHTML = appState.categories.map(c => `
-                <li class="bg-slate-800 p-3 rounded-xl flex justify-between items-center text-xs">
-                    <span>${c}</span>
-                    ${c !== 'همه' ? `<button onclick="deleteCategory('${c}')" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i></button>` : ''}
-                </li>
-            `).join('');
-        }
-
-        function addNewCategory() {
-            const val = document.getElementById('new-cat-input').value.trim();
-            if (!val || appState.categories.includes(val)) return;
-            appState.categories.push(val);
-            saveToStorage();
-            document.getElementById('new-cat-input').value = '';
-            renderAdminCategories();
-            renderPublicUI();
-            showToast('دسته‌بندی جدید اضافه شد.', 'success');
-        }
-
-        function deleteCategory(cat) {
-            appState.categories = appState.categories.filter(c => c !== cat);
-            saveToStorage();
-            renderAdminCategories();
-            renderPublicUI();
-        }
-
-        function renderAdminApprovals() {
-            const notice = document.getElementById('super-admin-only-notice');
-            const isSuper = appState.currentAdmin && appState.currentAdmin.role === 'super';
-
-            if (!isSuper) notice.classList.remove('hidden');
-            else notice.classList.add('hidden');
-
-            const tbody = document.getElementById('admin-approvals-table-body');
-            tbody.innerHTML = appState.admins.map(a => `
-                <tr class="hover:bg-slate-800/40">
-                    <td class="p-4 font-bold">${a.fullname}</td>
-                    <td class="p-4 text-slate-400 font-mono">${a.username}</td>
-                    <td class="p-4">${a.role === 'super' ? '<span class="text-warmgold font-bold">سوپر ادمین</span>' : 'ادمین معمولی'}</td>
-                    <td class="p-4">${a.status === 'approved' ? '<span class="text-emerald-400">تایید شده</span>' : '<span class="text-amber-400">در انتظار</span>'}</td>
-                    <td class="p-4">
-                        ${(isSuper && a.role !== 'super') ? `
-                            ${a.status === 'pending' ? `<button onclick="approveAdmin('${a.id}')" class="bg-emerald-600 text-white px-2 py-1 rounded text-[10px]">تایید</button>` : ''}
-                            <button onclick="deleteAdmin('${a.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-[10px] mr-1">حذف</button>
-                        ` : '-'}
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function approveAdmin(adminId) {
-            const admin = appState.admins.find(a => a.id === adminId);
-            if (admin) {
-                admin.status = 'approved';
-                saveToStorage();
-                renderAdminApprovals();
-                showToast('دست‌رسی ادمین تایید گردید.', 'success');
-            }
-        }
-
-        function deleteAdmin(adminId) {
-            appState.admins = appState.admins.filter(a => a.id !== adminId);
-            saveToStorage();
-            renderAdminApprovals();
-        }
-
-        function renderAdminSettings() {
-            document.getElementById('setting-logo-text').value = appState.storeSettings.shopName || '';
-            document.getElementById('setting-hero-slogan').value = appState.storeSettings.heroSlogan || '';
-            document.getElementById('setting-hero-banner').value = appState.storeSettings.heroBannerUrl || '';
-            document.getElementById('setting-phone').value = appState.storeSettings.phone || '';
-            document.getElementById('setting-instagram').value = appState.storeSettings.instagram || '';
-        }
-
-        function saveStoreSettings() {
-            appState.storeSettings = {
-                shopName: document.getElementById('setting-logo-text').value.trim(),
-                heroSlogan: document.getElementById('setting-hero-slogan').value.trim(),
-                heroBannerUrl: document.getElementById('setting-hero-banner').value.trim(),
-                phone: document.getElementById('setting-phone').value.trim(),
-                instagram: document.getElementById('setting-instagram').value.trim()
-            };
-            saveToStorage();
-            renderPublicUI();
-            showToast('تنظیمات برند ذخیره شد.', 'success');
-        }
-
-        function formatPrice(num) {
-            return num.toLocaleString('fa-IR');
-        }
-
-        function toggleMobileDrawer(open) {
-            const drawer = document.getElementById('mobile-drawer');
-            const content = document.getElementById('mobile-drawer-content');
-            if (open) {
-                drawer.classList.remove('opacity-0', 'pointer-events-none');
-                content.classList.remove('translate-x-full');
-            } else {
-                drawer.classList.add('opacity-0', 'pointer-events-none');
-                content.classList.add('translate-x-full');
-            }
-        }
-
-        function openAddProductModal() {
-            const name = prompt("نام لباس یا محصول جدید:");
-            if (!name) return;
-            const price = parseInt(prompt("قیمت به تومان:") || "0");
-            const category = prompt("دسته‌بندی (مثلاً: هودی و دورس):") || "همه";
-            const imageUrl = prompt("لینک عکس محصول (URL):") || "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=80";
-
-            const newProd = {
-                id: "prod_" + Date.now(),
-                name,
-                category,
-                price,
-                description: "لباس لوکس استریت‌ویر با پارچه پرمیوم ارگانیک نیوس.",
-                image: imageUrl,
-                colors: ["مشکی مات", "کرم"],
-                sizes: ["M", "L", "XL"],
-                variants: {
-                    "مشکی مات_M": 10, "مشکی مات_L": 10, "مشکی مات_XL": 5,
-                    "کرم_M": 5, "کرم_L": 5, "کرم_XL": 2
+        /* SEARCH MODAL TOGGLE */
+        function toggleSearchModal() {
+            const query = prompt('عبارت مورد نظر برای جستجو در محصولات را وارد کنید:');
+            if (query) {
+                const found = state.products.filter(p => p.title.includes(query) || p.description.includes(query));
+                if (found.length > 0) {
+                    openProductModal(found[0].id);
+                } else {
+                    showToast('محصولی با این مشخصات یافت نشد.', 'error');
                 }
-            };
+            }
+        }
 
-            appState.products.unshift(newProd);
-            saveToStorage();
-            renderAdminProductsTable();
-            renderPublicUI();
-            showToast('محصول جدید اضافه شد.', 'success');
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
         }
     </script>
 </body>
